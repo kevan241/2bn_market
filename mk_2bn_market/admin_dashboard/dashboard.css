@@ -1,0 +1,222 @@
+:root{
+    --background:#ffffff;
+    --background_footer:#032859;
+    --title:#032859;
+    --border:#03285930;
+    --title_second:#ffffff;
+    --section_title:#000000;
+    --text:#4B4B4B;
+}
+
+@font-face {
+    font-family: 'poppins-regular';
+    src: url('../src/assets/fonts/Poppins/Poppins-Regular.ttf');
+}
+
+@font-face {
+    font-family: 'poppins-semiBold';
+    src: url('../src/assets/fonts/Poppins/Poppins-SemiBold.ttf');
+}
+
+@font-face {
+    font-family: 'poppins-medium';
+    src: url('../src/assets/fonts/Poppins/Poppins-Medium.ttf');
+}
+
+@font-face {
+    font-family: 'poppins-bold';
+    src: url('../src/assets/fonts/Poppins/Poppins-Bold.ttf');
+}
+
+
+/*body paddding*/
+.admin_dashboard_login_container{
+    display: flex;
+}
+/*body padding*/
+
+/*login side*/
+.login_side h2{
+ color: var(--title);
+ text-align: left;
+}
+
+.banner_side{
+    background-image: url('../public/img/admin/banner.webp');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    height: 100vh;
+    width: 100vw;
+}
+
+.login_side{
+    box-sizing: border-box;
+    width: 55%;
+    padding: 150px 50px;
+}
+
+.login_side h2{
+    font-family: 'poppins-bold';
+    box-sizing: border-box;
+    font-size: 25px;
+}
+
+.login_side p{
+    font-family: 'poppins-regular';
+    font-size: 14px;
+    color: var(--text);
+}
+
+.login_form_container Button{
+    background-color: var(--background_footer);
+    color: var(--title_second);
+    font-family: 'poppins-semiBold';
+    font-size: 13px;
+    text-transform:uppercase;
+    width: 100%;
+    padding: 10px 0;
+    margin: 10px 0;
+    border-radius: 0px;
+}
+
+.forgot_password{
+    color: var(--title);
+    font-family: 'poppins-medium';
+    margin: 5px 0;
+    font-size: 13px;
+    text-align: right;
+    cursor: pointer;
+}
+/*login side*/
+
+/*dashboard  service container*/
+.admin_dashboard_service_container{
+    display: flex;
+    flex-direction: row;
+    gap:30px;
+}
+/*dashboard  service container*/
+
+/*side menu*/
+.dashboard_sidemenu ul li{
+    list-style-type: none;
+    margin:0 0 15px 0;
+    color: var(--title);
+    font-family: 'poppins-regular';
+    font-size: 13px;
+}
+
+.dashboard_sidemenu ul{
+    padding: 0!important;
+}
+
+.dashboard_sidemenu{
+    background-color: #E6EAED;
+    box-sizing: border-box;
+    height: 100vh;
+    width: 20vw;
+    padding: 50px 30px;
+    position: absolute;
+}
+
+.dashboard_sidemenu Button{
+    padding: 17px 40px 0 20px;
+    margin: 20px 0 0 0;
+    border: 0.5px solid var(--border);
+}
+/*side menu*/
+
+/* dashboard_maincontent */
+.dashboard_maincontent{
+    flex: 1;
+}
+.dashboard_maincontent h2{
+    color: var(--title);
+    width: 100%;
+    text-align: center;
+    padding: 20px 0;
+}
+/* dashboard_maincontent */
+
+
+
+/* création d'un produit*/
+.create_product_form{
+    display: flex;
+    flex-direction: column;
+    gap: 50px;
+    padding: 50px 100px 0 400px;
+    box-sizing: border-box;
+}
+
+.create_product_form h2{
+    color: var(--title);
+}
+
+.create_product_form{
+    width: 100%;
+}
+
+.product_preview h2{
+    color: var(--title);
+}
+
+
+/*création d'un produit*/
+
+/*modification d'un produit*/
+.admin_edit_product_container h2{
+    color: var(--title);
+    margin: 0 0 30px 0;
+}
+
+.admin_edit_product_container{
+    color: var(--title);
+    padding: 30px 100px 50px 400px;
+    box-sizing: border-box;
+}
+
+.admin_edit_product_list{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+.list_product{
+    width: 20%;
+}
+/* modification d'un produit*/
+
+/*suppression de produit*/
+.delete_product_container{
+    padding: 0px 100px 50px 400px;
+}
+
+.delete_product_grid {
+    display: flex !important;
+    flex-direction: row !important;
+    width: 100%;
+}
+
+.product_to_delete {
+    width: 30%;
+}
+
+.product_deleted {
+    height: 340px;
+    overflow: hidden;
+}
+
+.MuiCardContent-root.element_to_delete.css-1lt5qva-MuiCardContent-root p {
+    margin: 0 0 10px 0 !important;
+}
+
+.MuiCardContent-root.element_to_delete.css-1lt5qva-MuiCardContent-root h3{
+    font-family:'poppins-medium';
+    font-size: 15px;
+}
+
+/*suppression de produit*/
+
