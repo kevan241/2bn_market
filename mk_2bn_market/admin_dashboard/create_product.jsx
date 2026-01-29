@@ -2,6 +2,7 @@ import { Box, Button, TextField, MenuItem, LinearProgress, Typography } from '@m
 import { useState } from 'react';
 import { createProduct } from './services/productService';
 import SideMenu from './services/side_menu';
+import { API_URL } from '../src/config/api';
 import './dashboard.css';
 
 export default function CreateProduct() {
@@ -40,8 +41,8 @@ const handleImageUpload = async (e) => {
         formData.append('file', file);
         formData.append('category', 'Images'); // ← Catégorie pour les images
 
-        // ✅ Même route que les fichiers
-        const response = await fetch('http://localhost:5000/api/upload', {
+        // Même route que les fichiers
+        const response = await fetch(`${API_URL}/api/upload`, {
             method: 'POST',
             body: formData
         });
@@ -50,15 +51,15 @@ const handleImageUpload = async (e) => {
         
         if (data.success) {
             setImage(data.fileUrl); // ← Stocker l'URL
-            alert('✅ Image uploadée avec succès !');
+            alert('Image uploadée avec succès !');
         } else {
             throw new Error(data.error || 'Erreur upload image');
         }
 
     } catch (err) {
-        console.error('❌ Erreur image:', err);
+        console.error(' Erreur image:', err);
         setError(err.message);
-        alert('❌ Erreur : ' + err.message);
+        alert(' Erreur : ' + err.message);
     } finally {
         setUploadPicture(false);
     }
@@ -91,9 +92,9 @@ const handleFileUpload = async (e) => {
         formData.append('file', file);
         formData.append('category', category);
 
-        console.log('🔍 Envoi vers: http://localhost:5000/api/upload');
+        console.log('🔍 Envoi vers: ', `${API_URL}/api/upload`);
 
-        const response = await fetch('http://localhost:5000/api/upload', {
+        const response = await fetch(`${API_URL}/api/upload`, {
             method: 'POST',
             body: formData
         });
@@ -107,15 +108,15 @@ const handleFileUpload = async (e) => {
         if (data.success) {
             setFileUrl(data.fileUrl);
             setFileName(data.fileName);
-            alert('✅ Fichier uploadé avec succès !');
+            alert('Fichier uploadé avec succès !');
         } else {
             throw new Error(data.error || 'Erreur lors de l\'upload');
         }
 
     } catch (err) {
-        console.error('❌ Erreur complète:', err);
+        console.error('Erreur complète:', err);
         setError(err.message);
-        alert('❌ Erreur : ' + err.message);
+        alert('Erreur : ' + err.message);
     } finally {
         setUploadProgress(false);
     }

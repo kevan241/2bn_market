@@ -1,9 +1,9 @@
-const API_URL = 'http://localhost:5000/api/products';
+import { API_URL } from '../../src/config/api';
 
 // Créer un produit
 export const createProduct = async (productData) => {
   try {
-    const response = await fetch(API_URL, {
+    const response = await fetch(`${API_URL}/api/products`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(productData)
@@ -25,7 +25,7 @@ export const createProduct = async (productData) => {
 // Récupérer tous les produits
 export const getAllProducts = async () => {
   try {
-    const response = await fetch(API_URL);
+    const response = await fetch(`${API_URL}/api/products`);
     const data = await response.json();
 
     if (!response.ok) {

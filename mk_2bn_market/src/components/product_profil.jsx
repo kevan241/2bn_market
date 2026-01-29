@@ -2,6 +2,7 @@ import { Box, Button, Alert } from '@mui/material';
 import { useState, useEffect } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { getProductById } from './services/productServices';
+import { API_URL } from '../config/api';
 import PaymentForm from './checkout/ebilling_paiement';
 import '../custome.css';
 
@@ -36,7 +37,7 @@ export default function Product_profil() {
             if (email && id) {
                 setUserEmail(email);
                 try {
-                    const response = await fetch(`http://localhost:5000/api/payment/check-payment/${id}/${email}`);
+                    const response = await fetch(`${API_URL}/api/payment/check-payment/${id}/${email}`);
                     const data = await response.json();
                     setHasPaid(data.hasPaid);
                     
@@ -75,7 +76,7 @@ export default function Product_profil() {
     const handleDownload = () => {
         if (productProfil.fileUrl) {
             const link = document.createElement('a');
-            link.href = `http://localhost:5000/${productProfil.fileUrl}`;
+            link.href = `${API_URL}/${productProfil.fileUrl}`;
             link.download = '';
             document.body.appendChild(link);
             link.click();

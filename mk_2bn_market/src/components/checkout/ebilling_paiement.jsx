@@ -1,5 +1,6 @@
 import { Box, TextField, Button } from "@mui/material";
 import { useState } from 'react';
+import { API_URL } from '../../config/api';
 
 export default function EbillingPaiement({ product }) { // ← Reçoit le produit en props
     const [payer_msisdn, setPayer_msisdn] = useState('');
@@ -16,7 +17,7 @@ const handleCheckout = async () => {
         localStorage.setItem('userEmail', payer_email);
         localStorage.setItem('lastProductId', product._id); // ← AJOUTE
         
-        const response = await fetch('http://localhost:5000/api/payment/create-ebill', {
+        const response = await fetch(`${API_URL}/api/payment/create-ebill`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
