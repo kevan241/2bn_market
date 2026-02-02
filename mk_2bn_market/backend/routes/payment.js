@@ -3,7 +3,7 @@ const router = express.Router();
 const axios = require('axios');
 const Transaction = require('../models/transaction');
 
-const EBILLING_BASE_URL = 'https://stg.billing-easy.com/api/v1/merchant/e_bills.json';
+const EBILLING_BASE_URL = ' https://lab.billing-easy.net/api/v1/merchant/e_bills.json';
 const EBILLING_USERNAME = '2Bni';
 const EBILLING_SHAREDKEY = '20c57a6f-9571-459a-8e4e-9865324c62b9';
 
@@ -69,7 +69,7 @@ router.post('/create-ebill', async (req, res) => {
       });
       
       // ✅ redirect_url pointe vers le BACKEND
-      const payment_url = `https://staging.billing-easy.net/?invoice=${bill_id}&redirect_url=${BACKEND_URL}/api/payment/return`;
+      const payment_url = ` https://lab.billing-easy.net/?invoice=${bill_id}&redirect_url=${BACKEND_URL}/api/payment/return`;
 
       console.log('🔗 URL de paiement:', payment_url);
       
