@@ -23,8 +23,15 @@ app.use((req, res, next) => {
 // ✅ express.json() EN PREMIER
 app.use(express.json());
 
-// ✅ fileUpload seulement pour /api/upload
+// ✅ Ajoutez aussi express.urlencoded pour les form-data
+app.use(express.urlencoded({ extended: true }));
 
+// ✅ Middleware de debug pour le callback
+app.use('/api/payment/callback', (req, res, next) => {
+  console.log('🔍 Content-Type:', req.headers['content-type']);
+  console.log('🔍 Raw Body:', req.body);
+  next();
+});
 
 app.use('/uploads', express.static('public/uploads'));
 
