@@ -3,9 +3,13 @@ const router = express.Router();
 const axios = require('axios');
 const Transaction = require('../models/transaction');
 
-const EBILLING_BASE_URL = 'https://lab.billing-easy.net/api/v1/merchant/e_bills';
-const EBILLING_USERNAME = '2bni';
-const EBILLING_SHAREDKEY = '8d08402e-714f-445a-bd7d-75c982b54ba8';
+const EBILLING_BASE_URL = 'https://stg.billing-easy.com/api/v1/merchant/e_bills.json';
+const EBILLING_USERNAME = '2Bni';
+const EBILLING_SHAREDKEY = '20c57a6f-9571-459a-8e4e-9865324c62b9';
+
+// ✅ Variables d'environnement
+const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:5000';
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
 
 function getAuthHeader() {
   const token = Buffer.from(`${EBILLING_USERNAME}:${EBILLING_SHAREDKEY}`).toString('base64');
@@ -64,7 +68,8 @@ router.post('/create-ebill', async (req, res) => {
         status: 'pending'
       });
       
-      const payment_url = `https://test.billing-easy.net/?invoice=${bill_id}&redirect_url=http:// /api/payment/return`;
+      // ✅ redirect_url pointe vers le BACKEND
+      const payment_url = `https://staging.billing-easy.net/?invoice=${bill_id}&redirect_url=${BACKEND_URL}/api/payment/return`;
 
       console.log('🔗 URL de paiement:', payment_url);
       
@@ -120,7 +125,6 @@ router.post('/callback', async (req, res) => {
 });
 
 // ✅ Retour utilisateur (après paiement)
-// ✅ Retour utilisateur (après paiement)
 router.get('/return', async (req, res) => {
   console.log('🔙 Retour utilisateur');
   console.log('📋 Query params:', req.query);
@@ -139,8 +143,8 @@ router.get('/return', async (req, res) => {
       if (transaction) {
         console.log('✅ Transaction trouvée:', transaction.productId);
         
-        // Redirige vers la page du produit avec un paramètre de succès
-        res.redirect(`http://localhost:5173/product/${transaction.productId}?payment=success`);
+        // ✅ Redirige vers le FRONTEND
+        res.redirect(`${FRONTEND_URL}/product/${transaction.productId}?payment=success`);
         return;
       } else {
         console.log('❌ Transaction non trouvée pour bill_id:', bill_id);
@@ -150,11 +154,11 @@ router.get('/return', async (req, res) => {
     }
     
     // Si pas de transaction trouvée, redirige vers la page de succès avec un flag
-    res.redirect('http://localhost:5173/payment-success?completed=true');
+    res.redirect(`${FRONTEND_URL}/payment-success?completed=true`);
     
   } catch (error) {
     console.error('❌ Erreur retour:', error);
-    res.redirect('http://localhost:5173/payment-success?error=true');
+    res.redirect(`${FRONTEND_URL}/payment-success?error=true`);
   }
 });
 

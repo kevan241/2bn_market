@@ -64,7 +64,7 @@ router.post('/create-ebill', async (req, res) => {
         status: 'pending'
       });
       
-      const payment_url = `https://staging.billing-easy.net/?invoice=${bill_id}&redirect_url=http://localhost:5000/api/payment/return`;
+const payment_url = `https://staging.billing-easy.net/?invoice=${bill_id}&redirect_url=https://twobn-market.onrender.com/api/payment/return`;
 
       console.log('🔗 URL de paiement:', payment_url);
       
@@ -140,7 +140,7 @@ router.get('/return', async (req, res) => {
         console.log('✅ Transaction trouvée:', transaction.productId);
         
         // Redirige vers la page du produit avec un paramètre de succès
-        res.redirect(`http://localhost:5173/product/${transaction.productId}?payment=success`);
+        res.redirect(`https://2bn-market-55ud.vercel.app/product/${transaction.productId}?payment=success`);
         return;
       } else {
         console.log('❌ Transaction non trouvée pour bill_id:', bill_id);
@@ -150,11 +150,11 @@ router.get('/return', async (req, res) => {
     }
     
     // Si pas de transaction trouvée, redirige vers la page de succès avec un flag
-    res.redirect('http://localhost:5173/payment-success?completed=true');
+    res.redirect('https://2bn-market-55ud.vercel.app/payment-success?completed=true');
     
   } catch (error) {
     console.error('❌ Erreur retour:', error);
-    res.redirect('http://localhost:5173/payment-success?error=true');
+    res.redirect('https://2bn-market-55ud.vercel.app/payment-success?error=true');
   }
 });
 
