@@ -108,7 +108,7 @@ router.post('/callback', async (req, res) => {
       const dbTransaction = await Transaction.findOne({ ebill_id: e_bill.bill_id });
       
       if (dbTransaction) {
-        dbTransaction.status = 'paid';
+        dbTransaction.status = 'processed';
         dbTransaction.paid_at = new Date();
         await dbTransaction.save();
         console.log('💾 Transaction mise à jour:', dbTransaction._id);
