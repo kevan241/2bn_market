@@ -3,9 +3,9 @@ const router = express.Router();
 const axios = require('axios');
 const Transaction = require('../models/transaction');
 
-const EBILLING_BASE_URL = 'https://stg.billing-easy.com/api/v1/merchant/e_bills.json';
-const EBILLING_USERNAME = '2Bni';
-const EBILLING_SHAREDKEY = '20c57a6f-9571-459a-8e4e-9865324c62b9';
+const EBILLING_BASE_URL = 'https://lab.billing-easy.net/api/v1/merchant/e_bills.json';
+const EBILLING_USERNAME = process.env.EBILLING_USERNAME || '2bni';
+const EBILLING_SHAREDKEY = process.env.EBILLING_SHAREDKEY || '8d08402e-714f-445a-bd7d-75c982b54ba8';
 
 function getAuthHeader() {
   const token = Buffer.from(`${EBILLING_USERNAME}:${EBILLING_SHAREDKEY}`).toString('base64');
@@ -166,7 +166,7 @@ router.get('/check-payment/:productId/:userEmail', async (req, res) => {
     const transaction = await Transaction.findOne({
       productId: productId,
       userId: userEmail,
-      status: 'paid'
+      status: 'processed'
     });
     
     res.json({

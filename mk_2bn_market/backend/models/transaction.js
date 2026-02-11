@@ -14,7 +14,7 @@ const transactionSchema = new mongoose.Schema({
   payer_email: String,
   status: {
     type: String,
-    enum: ['pending', 'paid', 'failed'],
+    enum: ['pending', 'paid','processed', 'failed'],
     default: 'pending'
   },
   paid_at: Date

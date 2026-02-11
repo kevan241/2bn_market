@@ -11,7 +11,7 @@ connectDB();
 
 // Middleware
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:5174','https://2bn-market-55ud.vercel.app' ],
+  origin: ['http://localhost:5173', 'http://localhost:5174','https://2bn-market-55ud.vercel.app'],
   credentials: true
 }));
 
@@ -20,13 +20,13 @@ app.use((req, res, next) => {
   next();
 });
 
-// ✅ express.json() EN PREMIER
+// express.json() EN PREMIER
 app.use(express.json());
 
-// ✅ Ajoutez aussi express.urlencoded pour les form-data
+// Ajoutez aussi express.urlencoded pour les form-data
 app.use(express.urlencoded({ extended: true }));
 
-// ✅ Middleware de debug pour le callback
+// Middleware de debug pour le callback
 app.use('/api/payment/callback', (req, res, next) => {
   console.log('🔍 Content-Type:', req.headers['content-type']);
   console.log('🔍 Raw Body:', req.body);

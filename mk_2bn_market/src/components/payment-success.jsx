@@ -9,6 +9,8 @@ export default function PaymentSuccess() {
     useEffect(() => {
         // Récupère le dernier produit payé
         const lastProductId = localStorage.getItem('lastProductId');
+        const status = searchParams.get('completed');
+        console.log('Statut du paiement:', status);
         
         if (lastProductId && searchParams.get('completed') === 'true') {
             console.log('✅ Redirection vers le produit:', lastProductId);

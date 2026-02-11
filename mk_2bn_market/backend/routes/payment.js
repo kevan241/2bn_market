@@ -170,7 +170,7 @@ router.get('/check-payment/:productId/:userEmail', async (req, res) => {
     const transaction = await Transaction.findOne({
       productId: productId,
       userId: userEmail,
-      status: 'paid'
+      status: 'processed'
     });
     
     res.json({
