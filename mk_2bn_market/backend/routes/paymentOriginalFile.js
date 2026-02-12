@@ -7,6 +7,10 @@ const EBILLING_BASE_URL = 'https://lab.billing-easy.net/api/v1/merchant/e_bills.
 const EBILLING_USERNAME = process.env.EBILLING_USERNAME || '2bni';
 const EBILLING_SHAREDKEY = process.env.EBILLING_SHAREDKEY || '8d08402e-714f-445a-bd7d-75c982b54ba8';
 
+// ✅ Variables d'environnement
+const BACKEND_URL = process.env.BACKEND_URL || 'https://twobn-market.onrender.com';
+const FRONTEND_URL = process.env.FRONTEND_URL || 'https://2bn-market-55ud.vercel.app';
+
 function getAuthHeader() {
   const token = Buffer.from(`${EBILLING_USERNAME}:${EBILLING_SHAREDKEY}`).toString('base64');
   return `Basic ${token}`;
@@ -64,7 +68,8 @@ router.post('/create-ebill', async (req, res) => {
         status: 'pending'
       });
       
-const payment_url = `https://staging.billing-easy.net/?invoice=${bill_id}&redirect_url=https://twobn-market.onrender.com/api/payment/return`;
+      // ✅ redirect_url pointe vers le BACKEND
+      const payment_url = `https://test.billing-easy.net/?invoice=${bill_id}&redirect_url=${BACKEND_URL}/api/payment/return`;
 
       console.log('🔗 URL de paiement:', payment_url);
       
@@ -103,7 +108,7 @@ router.post('/callback', async (req, res) => {
       const dbTransaction = await Transaction.findOne({ ebill_id: e_bill.bill_id });
       
       if (dbTransaction) {
-        dbTransaction.status = 'pending';
+        dbTransaction.status = 'completed'; // ✅ CORRIGÉ : 'completed' au lieu de 'pending'
         dbTransaction.paid_at = new Date();
         await dbTransaction.save();
         console.log('💾 Transaction mise à jour:', dbTransaction._id);
@@ -120,7 +125,6 @@ router.post('/callback', async (req, res) => {
 });
 
 // ✅ Retour utilisateur (après paiement)
-// ✅ Retour utilisateur (après paiement)
 router.get('/return', async (req, res) => {
   console.log('🔙 Retour utilisateur');
   console.log('📋 Query params:', req.query);
@@ -133,28 +137,55 @@ router.get('/return', async (req, res) => {
     console.log('🔍 bill_id trouvé:', bill_id);
     
     if (bill_id) {
-      // Trouve la transaction correspondante
-      const transaction = await Transaction.findOne({ ebill_id: bill_id });
-      
-      if (transaction) {
-        console.log('✅ Transaction trouvée:', transaction.productId);
+      // ✅ AJOUTÉ : Vérifier le statut auprès d'EBILLING
+      try {
+        const billStatus = await axios.get(
+          `https://lab.billing-easy.net/api/v1/merchant/e_bills/${bill_id}`,
+          {
+            headers: {
+              'Authorization': getAuthHeader(),
+              'Accept': 'application/json'
+            }
+          }
+        );
         
-        // Redirige vers la page du produit avec un paramètre de succès
-        res.redirect(`https://2bn-market-55ud.vercel.app/product/${transaction.productId}?payment=success`);
-        return;
-      } else {
-        console.log('❌ Transaction non trouvée pour bill_id:', bill_id);
+        console.log('📊 Statut de la facture:', billStatus.data);
+        
+        // Trouve la transaction correspondante
+        const transaction = await Transaction.findOne({ ebill_id: bill_id });
+        
+        if (transaction) {
+          console.log('✅ Transaction trouvée:', transaction.productId);
+          
+          // ✅ AJOUTÉ : Mettre à jour si le paiement est confirmé
+          if (billStatus.data.e_bill && billStatus.data.e_bill.state === 'paid') {
+            transaction.status = 'completed';
+            transaction.paid_at = new Date();
+            await transaction.save();
+            console.log('💾 Transaction mise à jour via /return');
+          }
+          
+          // Redirige vers le FRONTEND avec le bon statut
+          const paymentStatus = transaction.status === 'completed' ? 'success' : 'pending';
+          res.redirect(`${FRONTEND_URL}/product/${transaction.productId}?payment=${paymentStatus}`);
+          return;
+        } else {
+          console.log('❌ Transaction non trouvée pour bill_id:', bill_id);
+        }
+      } catch (apiError) {
+        console.error('❌ Erreur lors de la vérification du statut:', apiError.message);
+        // Continue même si l'API échoue
       }
     } else {
       console.log('⚠️ Aucun bill_id dans les query params');
     }
     
     // Si pas de transaction trouvée, redirige vers la page de succès avec un flag
-    res.redirect('https://2bn-market-55ud.vercel.app/payment-success?completed=true');
+    res.redirect(`${FRONTEND_URL}/payment-success?completed=true`);
     
   } catch (error) {
     console.error('❌ Erreur retour:', error);
-    res.redirect('https://2bn-market-55ud.vercel.app/payment-success?error=true');
+    res.redirect(`${FRONTEND_URL}/payment-success?error=true`);
   }
 });
 
@@ -166,7 +197,7 @@ router.get('/check-payment/:productId/:userEmail', async (req, res) => {
     const transaction = await Transaction.findOne({
       productId: productId,
       userId: userEmail,
-      status: 'pending'
+      status: 'completed' // ✅ CORRIGÉ : 'completed' au lieu de 'pending'
     });
     
     res.json({

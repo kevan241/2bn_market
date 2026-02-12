@@ -108,7 +108,7 @@ router.post('/callback', async (req, res) => {
       const dbTransaction = await Transaction.findOne({ ebill_id: e_bill.bill_id });
       
       if (dbTransaction) {
-        dbTransaction.status = 'pending';
+        dbTransaction.status = 'completed'; // ✅ CORRIGÉ : 'completed' au lieu de 'pending'
         dbTransaction.paid_at = new Date();
         await dbTransaction.save();
         console.log('💾 Transaction mise à jour:', dbTransaction._id);
@@ -137,17 +137,44 @@ router.get('/return', async (req, res) => {
     console.log('🔍 bill_id trouvé:', bill_id);
     
     if (bill_id) {
-      // Trouve la transaction correspondante
-      const transaction = await Transaction.findOne({ ebill_id: bill_id });
-      
-      if (transaction) {
-        console.log('✅ Transaction trouvée:', transaction.productId);
+      // ✅ AJOUTÉ : Vérifier le statut auprès d'EBILLING
+      try {
+        const billStatus = await axios.get(
+          `https://lab.billing-easy.net/api/v1/merchant/e_bills/${bill_id}`,
+          {
+            headers: {
+              'Authorization': getAuthHeader(),
+              'Accept': 'application/json'
+            }
+          }
+        );
         
-        // ✅ Redirige vers le FRONTEND
-        res.redirect(`${FRONTEND_URL}/product/${transaction.productId}?payment=success`);
-        return;
-      } else {
-        console.log('❌ Transaction non trouvée pour bill_id:', bill_id);
+        console.log('📊 Statut de la facture:', billStatus.data);
+        
+        // Trouve la transaction correspondante
+        const transaction = await Transaction.findOne({ ebill_id: bill_id });
+        
+        if (transaction) {
+          console.log('✅ Transaction trouvée:', transaction.productId);
+          
+          // ✅ AJOUTÉ : Mettre à jour si le paiement est confirmé
+          if (billStatus.data.e_bill && billStatus.data.e_bill.state === 'paid') {
+            transaction.status = 'completed';
+            transaction.paid_at = new Date();
+            await transaction.save();
+            console.log('💾 Transaction mise à jour via /return');
+          }
+          
+          // Redirige vers le FRONTEND avec le bon statut
+          const paymentStatus = transaction.status === 'completed' ? 'success' : 'pending';
+          res.redirect(`${FRONTEND_URL}/product/${transaction.productId}?payment=${paymentStatus}`);
+          return;
+        } else {
+          console.log('❌ Transaction non trouvée pour bill_id:', bill_id);
+        }
+      } catch (apiError) {
+        console.error('❌ Erreur lors de la vérification du statut:', apiError.message);
+        // Continue même si l'API échoue
       }
     } else {
       console.log('⚠️ Aucun bill_id dans les query params');
@@ -170,7 +197,7 @@ router.get('/check-payment/:productId/:userEmail', async (req, res) => {
     const transaction = await Transaction.findOne({
       productId: productId,
       userId: userEmail,
-      status: 'pending'
+      status: 'completed' // ✅ CORRIGÉ : 'completed' au lieu de 'pending'
     });
     
     res.json({
