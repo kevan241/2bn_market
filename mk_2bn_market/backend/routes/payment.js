@@ -8,8 +8,8 @@ const EBILLING_USERNAME = process.env.EBILLING_USERNAME || '2bni';
 const EBILLING_SHAREDKEY = process.env.EBILLING_SHAREDKEY || '8d08402e-714f-445a-bd7d-75c982b54ba8';
 
 // ✅ Variables d'environnement
-const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:5000';
-const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
+const BACKEND_URL = process.env.BACKEND_URL || 'https://twobn-market.onrender.com';
+const FRONTEND_URL = process.env.FRONTEND_URL || 'https://2bn-market-55ud.vercel.app';
 
 function getAuthHeader() {
   const token = Buffer.from(`${EBILLING_USERNAME}:${EBILLING_SHAREDKEY}`).toString('base64');
@@ -65,7 +65,7 @@ router.post('/create-ebill', async (req, res) => {
         amount: amount,
         payer_msisdn: payer_msisdn,
         payer_email: payer_email,
-        status: 'processed'
+        status: 'pending'
       });
       
       // ✅ redirect_url pointe vers le BACKEND
@@ -108,7 +108,7 @@ router.post('/callback', async (req, res) => {
       const dbTransaction = await Transaction.findOne({ ebill_id: e_bill.bill_id });
       
       if (dbTransaction) {
-        dbTransaction.status = 'processed';
+        dbTransaction.status = 'pending';
         dbTransaction.paid_at = new Date();
         await dbTransaction.save();
         console.log('💾 Transaction mise à jour:', dbTransaction._id);
@@ -170,7 +170,7 @@ router.get('/check-payment/:productId/:userEmail', async (req, res) => {
     const transaction = await Transaction.findOne({
       productId: productId,
       userId: userEmail,
-      status: 'processed'
+      status: 'pending'
     });
     
     res.json({

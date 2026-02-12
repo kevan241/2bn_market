@@ -103,7 +103,7 @@ router.post('/callback', async (req, res) => {
       const dbTransaction = await Transaction.findOne({ ebill_id: e_bill.bill_id });
       
       if (dbTransaction) {
-        dbTransaction.status = 'processed';
+        dbTransaction.status = 'pending';
         dbTransaction.paid_at = new Date();
         await dbTransaction.save();
         console.log('💾 Transaction mise à jour:', dbTransaction._id);
@@ -166,7 +166,7 @@ router.get('/check-payment/:productId/:userEmail', async (req, res) => {
     const transaction = await Transaction.findOne({
       productId: productId,
       userId: userEmail,
-      status: 'processed'
+      status: 'pending'
     });
     
     res.json({
