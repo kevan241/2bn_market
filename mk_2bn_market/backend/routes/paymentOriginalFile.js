@@ -7,9 +7,6 @@ const EBILLING_BASE_URL = 'https://lab.billing-easy.net/api/v1/merchant/e_bills.
 const EBILLING_USERNAME = process.env.EBILLING_USERNAME || '2bni';
 const EBILLING_SHAREDKEY = process.env.EBILLING_SHAREDKEY || '8d08402e-714f-445a-bd7d-75c982b54ba8';
 
-const BACKEND_URL = process.env.BACKEND_URL || 'https://twobn-market.onrender.com';
-const FRONTEND_URL = process.env.FRONTEND_URL || 'https://2bn-market-55ud.vercel.app';
-
 function getAuthHeader() {
   const token = Buffer.from(`${EBILLING_USERNAME}:${EBILLING_SHAREDKEY}`).toString('base64');
   return `Basic ${token}`;
@@ -21,13 +18,6 @@ router.post('/create-ebill', async (req, res) => {
   
   try {
     const { payer_msisdn, payer_email, amount, productId, productName } = req.body;
-
-    if (!payer_msisdn || !payer_email || !amount || !productId || !productName) {
-      return res.status(400).json({ 
-        success: false, 
-        error: 'Données manquantes' 
-      });
-    }
 
     const external_reference = `${productId}-${Date.now()}`;
 
@@ -62,6 +52,7 @@ router.post('/create-ebill', async (req, res) => {
       const bill_id = response.data.e_bill.bill_id;
       console.log('✅ E-bill créé:', bill_id);
       
+      // ✅ Enregistre la transaction en base
       await Transaction.create({
         productId: productId,
         userId: payer_email,
@@ -73,7 +64,7 @@ router.post('/create-ebill', async (req, res) => {
         status: 'pending'
       });
       
-      const payment_url = `https://test.billing-easy.net/?invoice=${bill_id}&redirect_url=${BACKEND_URL}/api/payment/return`;
+const payment_url = `https://staging.billing-easy.net/?invoice=${bill_id}&redirect_url=https://twobn-market.onrender.com/api/payment/return`;
 
       console.log('🔗 URL de paiement:', payment_url);
       
@@ -98,42 +89,27 @@ router.post('/create-ebill', async (req, res) => {
   }
 });
 
+// ✅ Callback serveur-à-serveur (Ebilling envoie la confirmation ici)
 router.post('/callback', async (req, res) => {
   console.log('📥 Callback Ebilling reçu:', req.body);
   
   try {
     const { e_bill, transaction } = req.body;
     
-    if (!e_bill || !e_bill.bill_id) {
-      console.log('⚠️ Pas de bill_id dans le callback');
-      return res.status(400).json({ error: 'bill_id manquant' });
-    }
-
-    const dbTransaction = await Transaction.findOne({ ebill_id: e_bill.bill_id });
-    
-    if (!dbTransaction) {
-      console.log('❌ Transaction non trouvée pour bill_id:', e_bill.bill_id);
-      return res.status(404).json({ error: 'Transaction non trouvée' });
-    }
-
     if (transaction && transaction.status === 'SUCCESS') {
       console.log('✅ Paiement réussi !');
-      dbTransaction.status = 'success';
-      dbTransaction.paid_at = new Date();
-      await dbTransaction.save();
-      console.log('💾 Transaction mise à jour:', dbTransaction._id);
-    } else if (transaction && transaction.status === 'FAILED') {
-      console.log('❌ Paiement échoué');
-      dbTransaction.status = 'failed';
-      await dbTransaction.save();
-    } else if (transaction && transaction.status === 'CANCELLED') {
-      console.log('❌ Paiement annulé');
-      dbTransaction.status = 'cancelled';
-      await dbTransaction.save();
+      
+      // Trouve et met à jour la transaction
+      const dbTransaction = await Transaction.findOne({ ebill_id: e_bill.bill_id });
+      
+      if (dbTransaction) {
+        dbTransaction.status = 'pending';
+        dbTransaction.paid_at = new Date();
+        await dbTransaction.save();
+        console.log('💾 Transaction mise à jour:', dbTransaction._id);
+      }
     } else {
-      console.log('⏳ Paiement en attente');
-      dbTransaction.status = 'pending';
-      await dbTransaction.save();
+      console.log('❌ Paiement échoué ou en attente');
     }
     
     res.status(200).json({ status: 'received' });
@@ -143,32 +119,28 @@ router.post('/callback', async (req, res) => {
   }
 });
 
+// ✅ Retour utilisateur (après paiement)
+// ✅ Retour utilisateur (après paiement)
 router.get('/return', async (req, res) => {
   console.log('🔙 Retour utilisateur');
   console.log('📋 Query params:', req.query);
   console.log('📋 Full URL:', req.url);
   
   try {
-    const bill_id = req.query.invoice;
+    // Essaye de récupérer le bill_id de plusieurs manières
+    const bill_id = req.query.invoice || req.query.bill_id || req.query.bill;
     
     console.log('🔍 bill_id trouvé:', bill_id);
     
     if (bill_id) {
+      // Trouve la transaction correspondante
       const transaction = await Transaction.findOne({ ebill_id: bill_id });
       
       if (transaction) {
         console.log('✅ Transaction trouvée:', transaction.productId);
-        console.log('📊 Statut actuel:', transaction.status);
         
-        if (transaction.status === 'success') {
-          res.redirect(`${FRONTEND_URL}/product/${transaction.productId}?payment=success`);
-        } else if (transaction.status === 'pending') {
-          res.redirect(`${FRONTEND_URL}/product/${transaction.productId}?payment=pending`);
-        } else if (transaction.status === 'failed') {
-          res.redirect(`${FRONTEND_URL}/product/${transaction.productId}?payment=failed`);
-        } else {
-          res.redirect(`${FRONTEND_URL}/product/${transaction.productId}?payment=unknown`);
-        }
+        // Redirige vers la page du produit avec un paramètre de succès
+        res.redirect(`https://2bn-market-55ud.vercel.app/product/${transaction.productId}?payment=success`);
         return;
       } else {
         console.log('❌ Transaction non trouvée pour bill_id:', bill_id);
@@ -177,14 +149,16 @@ router.get('/return', async (req, res) => {
       console.log('⚠️ Aucun bill_id dans les query params');
     }
     
-    res.redirect(`${FRONTEND_URL}/payment-result?status=error`);
+    // Si pas de transaction trouvée, redirige vers la page de succès avec un flag
+    res.redirect('https://2bn-market-55ud.vercel.app/payment-success?completed=true');
     
   } catch (error) {
     console.error('❌ Erreur retour:', error);
-    res.redirect(`${FRONTEND_URL}/payment-result?status=error`);
+    res.redirect('https://2bn-market-55ud.vercel.app/payment-success?error=true');
   }
 });
 
+// ✅ Nouvelle route : Vérifier si un produit a été payé par un utilisateur
 router.get('/check-payment/:productId/:userEmail', async (req, res) => {
   try {
     const { productId, userEmail } = req.params;
@@ -192,7 +166,7 @@ router.get('/check-payment/:productId/:userEmail', async (req, res) => {
     const transaction = await Transaction.findOne({
       productId: productId,
       userId: userEmail,
-      status: 'success'
+      status: 'pending'
     });
     
     res.json({
@@ -201,50 +175,6 @@ router.get('/check-payment/:productId/:userEmail', async (req, res) => {
     });
   } catch (error) {
     console.error('❌ Erreur vérification:', error);
-    res.status(500).json({ error: error.message });
-  }
-});
-
-router.get('/transactions/:userEmail', async (req, res) => {
-  try {
-    const { userEmail } = req.params;
-    
-    const transactions = await Transaction.find({
-      userId: userEmail
-    }).sort({ createdAt: -1 });
-    
-    res.json({
-      success: true,
-      transactions: transactions
-    });
-  } catch (error) {
-    console.error('❌ Erreur récupération transactions:', error);
-    res.status(500).json({ error: error.message });
-  }
-});
-
-router.get('/transaction-status/:ebillId', async (req, res) => {
-  try {
-    const { ebillId } = req.params;
-    
-    const transaction = await Transaction.findOne({
-      ebill_id: ebillId
-    });
-    
-    if (!transaction) {
-      return res.status(404).json({
-        success: false,
-        error: 'Transaction non trouvée'
-      });
-    }
-    
-    res.json({
-      success: true,
-      status: transaction.status,
-      transaction: transaction
-    });
-  } catch (error) {
-    console.error('❌ Erreur statut transaction:', error);
     res.status(500).json({ error: error.message });
   }
 });
