@@ -34,7 +34,7 @@ const transactionSchema = new mongoose.Schema({
   status: {
     type: String,
     enum: ['pending', 'completed', 'failed', 'cancelled'],
-    default: 'pending'
+    default: 'processed'
   },
   paid_at: Date
 }, { timestamps: true });

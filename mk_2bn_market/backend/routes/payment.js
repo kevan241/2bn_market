@@ -65,7 +65,7 @@ router.post('/create-ebill', async (req, res) => {
         amount: amount,
         payer_msisdn: payer_msisdn,
         payer_email: payer_email,
-        status: 'pending'
+        status: 'processed'
       });
       
       // ✅ redirect_url pointe vers le BACKEND
