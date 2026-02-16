@@ -7,10 +7,10 @@ const fileUpload = require('express-fileupload');
 router.use(fileUpload());
 
 router.get('/', (req, res) => {
-  res.json({ message: '✅ Route /api/upload fonctionne ! Utilisez POST pour uploader.' });
+  res.json({ message: 'Route /api/upload fonctionne ! Utilisez POST pour uploader.' });
 });
 
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => { 
   console.log('📥 Upload reçu !');
   console.log('📁 Files:', req.files);
   console.log('📦 Body:', req.body);
@@ -38,9 +38,9 @@ router.post('/', (req, res) => {
     const filePath = path.join(targetDir, fileName);
     
     console.log('💾 Sauvegarde:', filePath);
-    file.mv(filePath);
+    await file.mv(filePath);  // ← Ajoute await
 
-const fileUrl = `http://localhost:5000/uploads/${category}/${fileName}`;
+    const fileUrl = `https://twobn-market.onrender.com/uploads/${category}/${fileName}`;
     console.log('✅ Upload réussi:', fileUrl);
 
     res.json({
