@@ -94,41 +94,45 @@ router.post('/create-ebill', async (req, res) => {
   }
 });
 
-// ✅ Callback serveur-à-serveur (Ebilling envoie la confirmation ici)
+// Callback serveur-à-serveur (Ebilling envoie la confirmation ici)
 router.post('/callback', async (req, res) => {
   console.log('📥 Callback Ebilling reçu:', req.body);
   
   try {
-    const { e_bill, transaction } = req.body;
+    const { state, bill_id, billid } = req.body;
     
-    if (transaction && transaction.status === 'SUCCESS') {
+    if (state === 'paid') {
       console.log('✅ Paiement réussi !');
       
+      const actualBillId = bill_id || billid;
+      
       // Trouve et met à jour la transaction
-      const dbTransaction = await Transaction.findOne({ ebill_id: e_bill.bill_id });
+      const dbTransaction = await Transaction.findOne({ ebill_id: actualBillId });
       
       if (dbTransaction) {
-        dbTransaction.status = 'completed'; // ✅ CORRIGÉ : 'completed' au lieu de 'pending'
+        dbTransaction.status = 'completed';
         dbTransaction.paid_at = new Date();
         await dbTransaction.save();
         console.log('💾 Transaction mise à jour:', dbTransaction._id);
+      } else {
+        console.log('❌ Transaction non trouvée pour bill_id:', actualBillId);
       }
     } else {
-      console.log('❌ Paiement échoué ou en attente');
+      console.log('⚠️ Paiement en attente, state:', state);
     }
     
     res.status(200).json({ status: 'received' });
   } catch (error) {
     console.error('❌ Erreur callback:', error);
-    res.status(500).json({ error: error.message });
+    res.status(200).json({ error: error.message });
   }
 });
 
 // ✅ Retour utilisateur (après paiement)
 router.get('/return', async (req, res) => {
-  console.log('🔙 Retour utilisateur');
-  console.log('📋 Query params:', req.query);
-  console.log('📋 Full URL:', req.url);
+  console.log('Retour utilisateur'); 
+  console.log('Query params:', req.query);
+  console.log('Full URL:', req.url);
   
   try {
     // Essaye de récupérer le bill_id de plusieurs manières

@@ -33,8 +33,8 @@ const transactionSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['pending', 'completed', 'processed', 'failed', 'cancelled'],
-    default: 'processed'
+    enum: ['pending', 'completed', 'failed', 'cancelled'],
+    default: 'pending'
   },
   paid_at: Date
 }, { timestamps: true });
