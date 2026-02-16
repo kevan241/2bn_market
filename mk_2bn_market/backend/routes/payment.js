@@ -99,15 +99,13 @@ router.post('/callback', async (req, res) => {
   console.log('📥 Callback Ebilling reçu:', req.body);
   
   try {
-    const { state, bill_id, billid } = req.body;
+    const { state, billingid } = req.body; // ← Utilise 'billingid'
     
     if (state === 'paid') {
       console.log('✅ Paiement réussi !');
       
-      const actualBillId = bill_id || billid;
-      
       // Trouve et met à jour la transaction
-      const dbTransaction = await Transaction.findOne({ ebill_id: actualBillId });
+      const dbTransaction = await Transaction.findOne({ ebill_id: billingid });
       
       if (dbTransaction) {
         dbTransaction.status = 'completed';
@@ -115,7 +113,7 @@ router.post('/callback', async (req, res) => {
         await dbTransaction.save();
         console.log('💾 Transaction mise à jour:', dbTransaction._id);
       } else {
-        console.log('❌ Transaction non trouvée pour bill_id:', actualBillId);
+        console.log('❌ Transaction non trouvée pour bill_id:', billingid);
       }
     } else {
       console.log('⚠️ Paiement en attente, state:', state);
