@@ -212,4 +212,21 @@ router.get('/check-payment/:productId/:userEmail', async (req, res) => {
   }
 });
 
+
+router.post('/mark-downloaded/:productId/:userEmail', async (req, res) => {
+  try {
+    const { productId, userEmail } = req.params;
+    
+    await Transaction.updateOne(
+      { productId: productId, userId: userEmail, status: 'completed' },
+      { downloaded: true }
+    );
+    
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Erreur mark-downloaded:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 module.exports = router;

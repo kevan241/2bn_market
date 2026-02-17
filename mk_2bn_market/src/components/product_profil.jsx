@@ -42,7 +42,13 @@ export default function Product_profil() {
                 try {
                     const response = await fetch(`${API_URL}/api/payment/check-payment/${id}/${email}`);
                     const data = await response.json();
-                    setHasPaid(data.hasPaid);
+                    
+                    if (data.downloaded) {
+                        localStorage.setItem(`downloaded_${id}`, 'true');
+                        setHasPaid(false);
+                    } else {
+                        setHasPaid(data.hasPaid);
+                    }
                 } catch (error) {
                     console.error('Erreur vérification paiement:', error);
                 }
@@ -70,7 +76,7 @@ export default function Product_profil() {
         return imagePath;
     };
 
-    const handleDownload = () => {
+    const handleDownload = async () => {
         if (productProfil.fileUrl) {
             const link = document.createElement('a');
             link.href = `${API_URL}/${productProfil.fileUrl}`;
@@ -79,6 +85,10 @@ export default function Product_profil() {
             link.click();
             document.body.removeChild(link);
             
+            const email = localStorage.getItem('userEmail');
+            await fetch(`${API_URL}/api/payment/mark-downloaded/${id}/${email}`, {
+                method: 'POST'
+            });
             localStorage.setItem(`downloaded_${id}`, 'true');
             setHasPaid(false);
         } else {

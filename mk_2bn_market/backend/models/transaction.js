@@ -36,6 +36,11 @@ const transactionSchema = new mongoose.Schema({
     enum: ['pending','processed', 'completed', 'failed', 'cancelled'],
     default: 'pending'
   },
+    paid_at: Date,
+  downloaded: {     
+    type: Boolean,
+    default: false
+  },
   paid_at: Date
 }, { timestamps: true });
 
