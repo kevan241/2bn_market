@@ -22,17 +22,20 @@ export default function Product_profil() {
             setProfilLoading(false);
         });
         
-        // ✅ Vérifie si on revient d'un paiement
         if (searchParams.get('payment') === 'success') {
             setShowSuccessMessage(true);
-            // Cache le message après 10 secondes
             setTimeout(() => setShowSuccessMessage(false), 10000);
         }
     }, [id, searchParams]);
 
-    // ✅ Vérifie si l'utilisateur a payé
     useEffect(() => {
         const checkPayment = async () => {
+            const alreadyDownloaded = localStorage.getItem(`downloaded_${id}`);
+            if (alreadyDownloaded) {
+                setHasPaid(false);
+                return;
+            }
+
             const email = localStorage.getItem('userEmail');
             if (email && id) {
                 setUserEmail(email);
@@ -40,11 +43,6 @@ export default function Product_profil() {
                     const response = await fetch(`${API_URL}/api/payment/check-payment/${id}/${email}`);
                     const data = await response.json();
                     setHasPaid(data.hasPaid);
-                    
-                    // Si paiement confirmé et message de succès, force le rechargement
-                    if (data.hasPaid && showSuccessMessage) {
-                        console.log('✅ Paiement confirmé !');
-                    }
                 } catch (error) {
                     console.error('Erreur vérification paiement:', error);
                 }
@@ -54,7 +52,6 @@ export default function Product_profil() {
         if (!profilLoading) {
             checkPayment();
             
-            // ✅ Revérifie toutes les 3 secondes si on vient de payer
             if (showSuccessMessage) {
                 const interval = setInterval(checkPayment, 3000);
                 return () => clearInterval(interval);
@@ -81,6 +78,9 @@ export default function Product_profil() {
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
+            
+            localStorage.setItem(`downloaded_${id}`, 'true');
+            setHasPaid(false);
         } else {
             alert('Aucun fichier disponible pour ce produit');
         }
@@ -97,10 +97,9 @@ export default function Product_profil() {
             </Box>
             <Box sx={{ flex: 1 }}>
                 <div className="profil_product_container_details">
-                    {/* ✅ Message de succès après paiement */}
                     {showSuccessMessage && (
                         <Alert severity="success" sx={{ marginBottom: 3 }}>
-                            🎉 Paiement réussi ! {hasPaid ? 'Vous pouvez maintenant télécharger le fichier.' : 'Vérification en cours...'}
+                            Paiement réussi ! {hasPaid ? 'Vous pouvez maintenant télécharger le fichier.' : 'Vérification en cours...'}
                         </Alert>
                     )}
                     
@@ -108,7 +107,6 @@ export default function Product_profil() {
                     <div className='product_description'>{productProfil.description}</div>
                     <div className='product_price'>{productProfil.price} XAF</div>
                     
-                    {/* ✅ Affiche le bouton de paiement seulement si pas encore payé */}
                     {!hasPaid && (
                         !showPaymentForm ? (
                             <Button className="basket_button" variant="contained" fullWidth
@@ -119,13 +117,12 @@ export default function Product_profil() {
                             <Box>
                                 <PaymentForm product={productProfil} />
                                 <Button fullWidth onClick={() => setShowPaymentForm(false)} sx={{ marginTop: 2 }}>
-                                    ← Annuler
+                                    Annuler
                                 </Button>
                             </Box>
                         )
                     )}
                     
-                    {/* ✅ Affiche le bouton de téléchargement seulement si payé */}
                     {hasPaid && productProfil.fileUrl && (
                         <Button 
                             className="basket_button_validate" 
@@ -134,20 +131,19 @@ export default function Product_profil() {
                             onClick={handleDownload}
                             sx={{ marginTop: 3 }}
                         >
-                            📥 Télécharger le fichier
+                            Télécharger le fichier
                         </Button>
                     )}
                     
                     {hasPaid && !productProfil.fileUrl && (
                         <Box sx={{ marginTop: 3, color: 'orange' }}>
-                            ⚠️ Paiement confirmé mais aucun fichier disponible
+                            Paiement confirmé mais aucun fichier disponible
                         </Box>
                     )}
                     
-                    {/* Message de chargement pendant la vérification */}
                     {showSuccessMessage && !hasPaid && (
                         <Box sx={{ marginTop: 3, color: 'blue' }}>
-                            ⏳ Vérification du paiement en cours...
+                            Vérification du paiement en cours...
                         </Box>
                     )}
                 </div>
