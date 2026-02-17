@@ -7,7 +7,6 @@ const EBILLING_BASE_URL = 'https://lab.billing-easy.net/api/v1/merchant/e_bills.
 const EBILLING_USERNAME = process.env.EBILLING_USERNAME || '2bni';
 const EBILLING_SHAREDKEY = process.env.EBILLING_SHAREDKEY || '8d08402e-714f-445a-bd7d-75c982b54ba8';
 
-// ✅ Variables d'environnement
 const BACKEND_URL = process.env.BACKEND_URL || 'https://twobn-market.onrender.com';
 const FRONTEND_URL = process.env.FRONTEND_URL || 'https://2bn-market-55ud.vercel.app';
 
@@ -17,8 +16,8 @@ function getAuthHeader() {
 }
 
 router.post('/create-ebill', async (req, res) => {
-  console.log('🔥 ROUTE APPELÉE');
-  console.log('📥 Body:', req.body);
+  console.log('Route appelée');
+  console.log('Body:', req.body);
   
   try {
     const { payer_msisdn, payer_email, amount, productId, productName } = req.body;
@@ -36,7 +35,7 @@ router.post('/create-ebill', async (req, res) => {
       expiry_period: "60"
     };
 
-    console.log('📤 Envoi vers Ebilling:', payload);
+    console.log('Envoi vers Ebilling:', payload);
 
     const response = await axios.post(
       EBILLING_BASE_URL,
@@ -50,13 +49,12 @@ router.post('/create-ebill', async (req, res) => {
       }
     );
 
-    console.log('📥 Réponse Ebilling:', response.data);
+    console.log('Réponse Ebilling:', response.data);
 
     if (response.data.e_bill && response.data.e_bill.bill_id) {
       const bill_id = response.data.e_bill.bill_id;
-      console.log('✅ E-bill créé:', bill_id);
+      console.log('E-bill créé:', bill_id);
       
-      // ✅ Enregistre la transaction en base
       await Transaction.create({
         productId: productId,
         userId: payer_email,
@@ -68,10 +66,9 @@ router.post('/create-ebill', async (req, res) => {
         status: 'pending'
       });
       
-      // ✅ redirect_url pointe vers le BACKEND
       const payment_url = `https://test.billing-easy.net/?invoice=${bill_id}&redirect_url=${BACKEND_URL}/api/payment/return`;
 
-      console.log('🔗 URL de paiement:', payment_url);
+      console.log('URL de paiement:', payment_url);
       
       res.json({
         success: true,
@@ -83,7 +80,7 @@ router.post('/create-ebill', async (req, res) => {
     }
 
   } catch (error) {
-    console.error('❌ Erreur:', error.message);
+    console.error('Erreur:', error.message);
     if (error.response) {
       console.error('Erreur API:', error.response.data);
     }
@@ -94,52 +91,47 @@ router.post('/create-ebill', async (req, res) => {
   }
 });
 
-// Callback serveur-à-serveur (Ebilling envoie la confirmation ici)
 router.post('/callback', async (req, res) => {
-  console.log('📥 Callback Ebilling reçu:', req.body);
+  console.log('Callback Ebilling reçu:', req.body);
   
   try {
-    const { state, billingid } = req.body; // ← Utilise 'billingid'
+    const { state, billingid } = req.body;
     
     if (state === 'paid') {
-      console.log('✅ Paiement réussi !');
+      console.log('Paiement réussi !');
       
-      // Trouve et met à jour la transaction
       const dbTransaction = await Transaction.findOne({ ebill_id: billingid });
       
       if (dbTransaction) {
         dbTransaction.status = 'completed';
         dbTransaction.paid_at = new Date();
         await dbTransaction.save();
-        console.log('💾 Transaction mise à jour:', dbTransaction._id);
+        console.log('Transaction mise à jour:', dbTransaction._id);
       } else {
-        console.log('❌ Transaction non trouvée pour bill_id:', billingid);
+        console.log('Transaction non trouvée pour bill_id:', billingid);
       }
     } else {
-      console.log('⚠️ Paiement en attente, state:', state);
+      console.log('Paiement en attente, state:', state);
     }
     
     res.status(200).json({ status: 'received' });
   } catch (error) {
-    console.error('❌ Erreur callback:', error);
+    console.error('Erreur callback:', error);
     res.status(200).json({ error: error.message });
   }
 });
 
-// ✅ Retour utilisateur (après paiement)
 router.get('/return', async (req, res) => {
   console.log('Retour utilisateur'); 
   console.log('Query params:', req.query);
   console.log('Full URL:', req.url);
   
   try {
-    // Essaye de récupérer le bill_id de plusieurs manières
     const bill_id = req.query.invoice || req.query.bill_id || req.query.bill;
     
-    console.log('🔍 bill_id trouvé:', bill_id);
+    console.log('bill_id trouvé:', bill_id);
     
     if (bill_id) {
-      // ✅ AJOUTÉ : Vérifier le statut auprès d'EBILLING
       try {
         const billStatus = await axios.get(
           `https://lab.billing-easy.net/api/v1/merchant/e_bills/${bill_id}`,
@@ -151,47 +143,41 @@ router.get('/return', async (req, res) => {
           }
         );
         
-        console.log('📊 Statut de la facture:', billStatus.data);
+        console.log('Statut de la facture:', billStatus.data);
         
-        // Trouve la transaction correspondante
         const transaction = await Transaction.findOne({ ebill_id: bill_id });
         
         if (transaction) {
-          console.log('✅ Transaction trouvée:', transaction.productId);
+          console.log('Transaction trouvée:', transaction.productId);
           
-          // ✅ AJOUTÉ : Mettre à jour si le paiement est confirmé
           if (billStatus.data.e_bill && billStatus.data.e_bill.state === 'paid') {
             transaction.status = 'completed';
             transaction.paid_at = new Date();
             await transaction.save();
-            console.log('💾 Transaction mise à jour via /return');
+            console.log('Transaction mise à jour via /return');
           }
           
-          // Redirige vers le FRONTEND avec le bon statut
           const paymentStatus = transaction.status === 'completed' ? 'success' : 'pending';
           res.redirect(`${FRONTEND_URL}/product/${transaction.productId}?payment=${paymentStatus}`);
           return;
         } else {
-          console.log('❌ Transaction non trouvée pour bill_id:', bill_id);
+          console.log('Transaction non trouvée pour bill_id:', bill_id);
         }
       } catch (apiError) {
-        console.error('❌ Erreur lors de la vérification du statut:', apiError.message);
-        // Continue même si l'API échoue
+        console.error('Erreur lors de la vérification du statut:', apiError.message);
       }
     } else {
-      console.log('⚠️ Aucun bill_id dans les query params');
+      console.log('Aucun bill_id dans les query params');
     }
     
-    // Si pas de transaction trouvée, redirige vers la page de succès avec un flag
     res.redirect(`${FRONTEND_URL}/payment-success?completed=true`);
     
   } catch (error) {
-    console.error('❌ Erreur retour:', error);
+    console.error('Erreur retour:', error);
     res.redirect(`${FRONTEND_URL}/payment-success?error=true`);
   }
 });
 
-// ✅ Nouvelle route : Vérifier si un produit a été payé par un utilisateur
 router.get('/check-payment/:productId/:userEmail', async (req, res) => {
   try {
     const { productId, userEmail } = req.params;
@@ -199,19 +185,18 @@ router.get('/check-payment/:productId/:userEmail', async (req, res) => {
     const transaction = await Transaction.findOne({
       productId: productId,
       userId: userEmail,
-      status: 'completed' // ✅ CORRIGÉ : 'completed' au lieu de 'pending'
+      status: 'completed'
     });
     
     res.json({
-      hasPaid: !!transaction,
-      transaction: transaction
+      hasPaid: !!transaction && !transaction?.downloaded,
+      downloaded: transaction?.downloaded || false
     });
   } catch (error) {
-    console.error('❌ Erreur vérification:', error);
+    console.error('Erreur vérification:', error);
     res.status(500).json({ error: error.message });
   }
 });
-
 
 router.post('/mark-downloaded/:productId/:userEmail', async (req, res) => {
   try {

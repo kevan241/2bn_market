@@ -33,15 +33,14 @@ const transactionSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['pending','processed', 'completed', 'failed', 'cancelled'],
+    enum: ['pending', 'processed', 'completed', 'failed', 'cancelled'],
     default: 'pending'
   },
-    paid_at: Date,
-  downloaded: {     
+  paid_at: Date,
+  downloaded: {
     type: Boolean,
     default: false
-  },
-  paid_at: Date
+  }
 }, { timestamps: true });
 
 transactionSchema.index({ productId: 1, userId: 1 });
