@@ -215,23 +215,5 @@ router.post('/mark-downloaded/:productId/:userEmail', async (req, res) => {
 });
 
 
-router.get('/fix-old-transactions', async (req, res) => {
-  try {
-    const result = await Transaction.updateMany(
-      { status: 'completed', downloaded: { $exists: false } },
-      { $set: { downloaded: false } }
-    );
-    res.json({ 
-      success: true,
-      updated: result.modifiedCount,
-      message: `${result.modifiedCount} transactions mises à jour` 
-    });
-  } catch (error) {
-    console.error('Erreur fix:', error);
-    res.status(500).json({ error: error.message });
-  }
-});
-
-module.exports = router;
 
 module.exports = router;
