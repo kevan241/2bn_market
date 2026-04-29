@@ -11,6 +11,7 @@ export default function CreateProduct() {
     const [name, setName] = useState('');
     const [notice, setNotice] = useState('');
     const [description, setDescription] = useState('');
+    const [content, setContent] = useState('');
     const [price, setPrice] = useState('');
     const [categories, setCategories] = useState('');
     const [fileUrl, setFileUrl] = useState('');
@@ -135,7 +136,8 @@ const handleFileUpload = async (e) => {
                 description,
                 price,
                 categories,
-                fileUrl
+                fileUrl,
+                content
             };
 
             await createProduct(productData);
@@ -148,6 +150,7 @@ const handleFileUpload = async (e) => {
             setCategories('');
             setFileUrl('');
             setFileName('');
+            setContent('');
             
             alert('Produit créé avec succès ! ✅');
 
@@ -211,6 +214,16 @@ const handleFileUpload = async (e) => {
                         margin="normal"
                         value={notice}
                         onChange={(e) => setNotice(e.target.value)}
+                        disabled={loading}
+                        required 
+                    />
+                    <TextField 
+                        className='input_product' 
+                        fullWidth 
+                        label="Contenu (texte complet)" 
+                        margin="normal"
+                        value={content}
+                        onChange={(e) => setContent(e.target.value)}
                         disabled={loading}
                         required 
                     />

@@ -15,18 +15,20 @@ export default function Product_profil() {
     const [hasPaid, setHasPaid] = useState(false);
     const [userEmail, setUserEmail] = useState('');
     const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+    const [fileData, setFileData] = useState([]);
 
     useEffect(() => {
         getProductById(id).then(data => {
             setProductProfil(data);
             setProfilLoading(false);
         });
-        
+
         if (searchParams.get('payment') === 'success') {
             setShowSuccessMessage(true);
             setTimeout(() => setShowSuccessMessage(false), 10000);
         }
     }, [id, searchParams]);
+
 
     useEffect(() => {
         const checkPayment = async () => {
@@ -115,6 +117,7 @@ export default function Product_profil() {
                     
                     <div className='product_title'><h2>{productProfil.name}</h2></div>
                     <div className='product_description'>{productProfil.description}</div>
+                    <div className='product_content'>{productProfil.content}</div>
                     <div className='product_price'>{productProfil.price} XAF</div>
                     
                     {!hasPaid && (

@@ -42,7 +42,7 @@ export const getAllProducts = async () => {
 // Supprimer un produit
 export const deleteProduct = async (id) => {
   try {
-    const response = await fetch(`${API_URL}/${id}`, {
+    const response = await fetch(`${API_URL}/api/products/${id}`, {
       method: 'DELETE'
     });
 

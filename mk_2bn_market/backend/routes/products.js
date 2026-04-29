@@ -12,6 +12,16 @@ router.get('/', async (req, res) => {
   }
 });
 
+// GET - les détails du fileUrl lier au produit
+/*router.get('/fileUrl', async (req, res) => {
+  try {
+    const products = await Product.find({}, 'name fileUrl');
+    res.json(products);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});*/
+
 
 // GET - Récupérer un produit par ID
 router.get('/:id', async (req, res) => {
@@ -65,5 +75,6 @@ router.put('/:id', async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 });
+
 
 module.exports = router;
