@@ -1,12 +1,16 @@
 import { Box, Button, Alert } from '@mui/material';
-import { useState, useEffect } from 'react';
-import { useParams, useSearchParams } from 'react-router-dom';
-import { getProductById } from './services/productServices';
-import { API_URL } from '../config/api';
+import { useState, useEffect } from 'react'; // pour gérer l'état du composant et les effets secondaires liés au chargement des données et à la vérification du paiement
+import { useParams, useSearchParams } from 'react-router-dom'; //récupere l'id du produit dans l'url et les paramètres de recherche
+import { getProductById } from './services/productServices'; // fonction pour récupérer les détails du produit à partir de l'API en utilisant l'id du produit
+import { API_URL } from '../config/api'; // URL de base de l'API pour les requêtes liées au paiement et au téléchargement
 import PaymentForm from './checkout/ebilling_paiement';
 import '../custome.css';
 
+
+
+
 export default function Product_profil() {
+
     const { id } = useParams();
     const [searchParams] = useSearchParams();
     const [productProfil, setProductProfil] = useState(null);
@@ -81,7 +85,7 @@ export default function Product_profil() {
     const handleDownload = async () => {
         if (productProfil.fileUrl) {
             const link = document.createElement('a');
-            link.href = `${API_URL}/${productProfil.fileUrl}`;
+            link.href = productProfil.fileUrl;
             link.download = '';
             document.body.appendChild(link);
             link.click();
