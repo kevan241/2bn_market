@@ -224,21 +224,21 @@ router.post('/mark-downloaded/:productId/:userEmail', async (req, res) => {
 });
 
 router.get('/download/:productId/:userEmail', async (req, res) => {
-    const { productId, userEmail } = req.params;
-    const decodedEmail = decodeURIComponent(userEmail); // ← ajoute cette ligne
+    try {
+        const { productId, userEmail } = req.params;
+        const decodedEmail = decodeURIComponent(userEmail);
 
-    const transaction = await Transaction.findOne({
-        productId: productId,
-        userId: decodedEmail, // ← remplace userEmail par decodedEmail
-        status: 'completed',
-        downloadCount: { $lt: 1 }
-    });
+        const transaction = await Transaction.findOne({
+            productId: productId,
+            userId: decodedEmail,
+            status: 'completed',
+            downloadCount: { $lt: 1 }
+        });
 
         if (!transaction) {
             return res.status(403).json({ error: 'Accès refusé' });
         }
 
-        // Récupérer le produit pour avoir le fileId Drive
         const Product = require('../models/product');
         const product = await Product.findById(productId);
 
@@ -246,18 +246,15 @@ router.get('/download/:productId/:userEmail', async (req, res) => {
             return res.status(404).json({ error: 'Fichier introuvable' });
         }
 
-        // Extraire l'id Drive depuis l'URL
         const match = product.fileUrl.match(/id=([a-zA-Z0-9_-]+)/);
         if (!match) {
             return res.status(400).json({ error: 'ID Drive invalide' });
         }
         const fileId = match[1];
 
-        // Incrémenter le compteur
         transaction.downloadCount = (transaction.downloadCount || 0) + 1;
         await transaction.save();
 
-        // Streamer le fichier depuis Drive
         const drive = google.drive({ version: 'v3', auth });
 
         const fileMeta = await drive.files.get({ fileId, fields: 'name, mimeType' });
