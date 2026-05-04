@@ -85,7 +85,8 @@ export default function Product_profil() {
 const handleDownload = async () => {
     if (productProfil.fileUrl) {
         const email = localStorage.getItem('userEmail');
-        window.location.href = `${API_URL}/api/payment/download/${id}/${email}`;
+            window.location.href = `${API_URL}/api/payment/download/${id}/${encodeURIComponent(email)}`;
+
     } else {
         alert('Aucun fichier disponible pour ce produit');
     }

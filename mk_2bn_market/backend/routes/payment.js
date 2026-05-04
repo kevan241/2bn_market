@@ -224,16 +224,15 @@ router.post('/mark-downloaded/:productId/:userEmail', async (req, res) => {
 });
 
 router.get('/download/:productId/:userEmail', async (req, res) => {
-    try {
-        const { productId, userEmail } = req.params;
+    const { productId, userEmail } = req.params;
+    const decodedEmail = decodeURIComponent(userEmail); // ← ajoute cette ligne
 
-        // Vérifier le paiement
-        const transaction = await Transaction.findOne({
-            productId: productId,
-            userId: userEmail,
-            status: 'completed',
-            downloadCount: { $lt: 1 }
-        });
+    const transaction = await Transaction.findOne({
+        productId: productId,
+        userId: decodedEmail, // ← remplace userEmail par decodedEmail
+        status: 'completed',
+        downloadCount: { $lt: 1 }
+    });
 
         if (!transaction) {
             return res.status(403).json({ error: 'Accès refusé' });
