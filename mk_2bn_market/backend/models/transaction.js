@@ -40,7 +40,8 @@ const transactionSchema = new mongoose.Schema({
   downloaded: {
     type: Boolean,
     default: false
-  }
+  },
+  downloadCount: { type: Number, default: 0 }
 }, { timestamps: true });
 
 transactionSchema.index({ productId: 1, userId: 1 });

@@ -84,14 +84,8 @@ export default function Product_profil() {
 
 const handleDownload = async () => {
     if (productProfil.fileUrl) {
-        window.open(productProfil.fileUrl, '_blank');
-        
         const email = localStorage.getItem('userEmail');
-        await fetch(`${API_URL}/api/payment/mark-downloaded/${id}/${email}`, {
-            method: 'POST'
-        });
-        localStorage.setItem(`downloaded_${id}`, 'true');
-        setHasPaid(false);
+        window.location.href = `${API_URL}/api/payment/download/${id}/${email}`;
     } else {
         alert('Aucun fichier disponible pour ce produit');
     }

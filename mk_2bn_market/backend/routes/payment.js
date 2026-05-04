@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const axios = require('axios');
 const Transaction = require('../models/transaction');
+const {google} = require('googleapis');
 
 const EBILLING_BASE_URL = 'https://lab.billing-easy.net/api/v1/merchant/e_bills.json';
 const EBILLING_USERNAME = process.env.EBILLING_USERNAME || '2bni';
@@ -14,6 +15,14 @@ function getAuthHeader() {
   const token = Buffer.from(`${EBILLING_USERNAME}:${EBILLING_SHAREDKEY}`).toString('base64');
   return `Basic ${token}`;
 }
+
+const auth = new google.auth.GoogleAuth({
+    credentials: {
+        client_email: process.env.GOOGLE_CLIENT_EMAIL,
+        private_key: process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+    },
+    scopes: ['https://www.googleapis.com/auth/drive.readonly'],
+});
 
 router.post('/create-ebill', async (req, res) => {
   console.log('Route appelée');
@@ -189,8 +198,8 @@ router.get('/check-payment/:productId/:userEmail', async (req, res) => {
     });
     
     res.json({
-      hasPaid: !!transaction && !transaction?.downloaded,
-      downloaded: transaction?.downloaded || false
+      hasPaid: !!transaction && transaction.downloadCount < 1,
+      downloaded: transaction?.downloadCount >= 1 || false
     });
   } catch (error) {
     console.error('Erreur vérification:', error);
@@ -214,6 +223,60 @@ router.post('/mark-downloaded/:productId/:userEmail', async (req, res) => {
   }
 });
 
+router.get('/download/:productId/:userEmail', async (req, res) => {
+    try {
+        const { productId, userEmail } = req.params;
 
+        // Vérifier le paiement
+        const transaction = await Transaction.findOne({
+            productId: productId,
+            userId: userEmail,
+            status: 'completed',
+            downloadCount: { $lt: 1 }
+        });
+
+        if (!transaction) {
+            return res.status(403).json({ error: 'Accès refusé' });
+        }
+
+        // Récupérer le produit pour avoir le fileId Drive
+        const Product = require('../models/product');
+        const product = await Product.findById(productId);
+
+        if (!product || !product.fileUrl) {
+            return res.status(404).json({ error: 'Fichier introuvable' });
+        }
+
+        // Extraire l'id Drive depuis l'URL
+        const match = product.fileUrl.match(/id=([a-zA-Z0-9_-]+)/);
+        if (!match) {
+            return res.status(400).json({ error: 'ID Drive invalide' });
+        }
+        const fileId = match[1];
+
+        // Incrémenter le compteur
+        transaction.downloadCount = (transaction.downloadCount || 0) + 1;
+        await transaction.save();
+
+        // Streamer le fichier depuis Drive
+        const drive = google.drive({ version: 'v3', auth });
+
+        const fileMeta = await drive.files.get({ fileId, fields: 'name, mimeType' });
+
+        res.setHeader('Content-Disposition', `attachment; filename="${fileMeta.data.name}"`);
+        res.setHeader('Content-Type', fileMeta.data.mimeType);
+
+        const fileStream = await drive.files.get(
+            { fileId, alt: 'media' },
+            { responseType: 'stream' }
+        );
+
+        fileStream.data.pipe(res);
+
+    } catch (error) {
+        console.error('Erreur download:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
 
 module.exports = router;
