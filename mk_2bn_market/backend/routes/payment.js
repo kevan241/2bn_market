@@ -239,7 +239,7 @@ router.get('/download/:productId/:userEmail', async (req, res) => {
             return res.status(403).json({ error: 'Accès refusé' });
         }
 
-        const Product = require('../models/product');
+        const Product = require('../models/Product');
         const product = await Product.findById(ProductId);
 
         if (!product || !product.fileUrl) {
