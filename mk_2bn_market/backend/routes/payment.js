@@ -240,7 +240,7 @@ router.get('/download/:productId/:userEmail', async (req, res) => {
         }
 
         const Product = require('../models/product');
-        const product = await Product.findById(productId);
+        const product = await Product.findById(ProductId);
 
         if (!product || !product.fileUrl) {
             return res.status(404).json({ error: 'Fichier introuvable' });
