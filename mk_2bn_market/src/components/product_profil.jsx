@@ -110,7 +110,7 @@ const handleDownload = async () => {
                     )}
                     
                     <div className='product_title'><h2>{productProfil.name}</h2></div>
-                    <div className='product_description'>{productProfil.description}</div>
+                    <div className='product_description'>{productProfil.description}</div><br />
                     <div className='product_content'>{productProfil.content}</div>
                     <div className='product_price'>{productProfil.price} XAF</div>
                     
