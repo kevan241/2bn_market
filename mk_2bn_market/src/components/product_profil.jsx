@@ -82,25 +82,20 @@ export default function Product_profil() {
         return imagePath;
     };
 
-    const handleDownload = async () => {
-        if (productProfil.fileUrl) {
-            const link = document.createElement('a');
-            link.href = productProfil.fileUrl;
-            link.download = '';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            
-            const email = localStorage.getItem('userEmail');
-            await fetch(`${API_URL}/api/payment/mark-downloaded/${id}/${email}`, {
-                method: 'POST'
-            });
-            localStorage.setItem(`downloaded_${id}`, 'true');
-            setHasPaid(false);
-        } else {
-            alert('Aucun fichier disponible pour ce produit');
-        }
-    };
+const handleDownload = async () => {
+    if (productProfil.fileUrl) {
+        window.open(productProfil.fileUrl, '_blank');
+        
+        const email = localStorage.getItem('userEmail');
+        await fetch(`${API_URL}/api/payment/mark-downloaded/${id}/${email}`, {
+            method: 'POST'
+        });
+        localStorage.setItem(`downloaded_${id}`, 'true');
+        setHasPaid(false);
+    } else {
+        alert('Aucun fichier disponible pour ce produit');
+    }
+};
 
     return (
         <Box className="product_profil_container" sx={{ display: 'flex', padding: '30px 80px' }}>
