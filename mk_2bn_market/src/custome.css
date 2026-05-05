@@ -572,6 +572,18 @@ p.notice {
     margin-bottom: 8px !important;
 }
 
+.navbar_container {
+    margin: 0;
+    overflow: hidden;
+    top: 0;
+    background-color: var(--background_footer);
+    color: var(--title_second);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 25px 20px;
+}
+
 
 .product_img img {
     width: 100%;
