@@ -8,7 +8,8 @@ import './dashboard.css';
 export default function CreateProduct() {
     
     const [image, setImage] = useState('');
-    const [uploadPicture, setUploadPicture] = useState('');
+    const [imagePreview, setImagePreview] = useState('');
+    const [uploadPicture, setUploadPicture] = useState(false);
     const [name, setName] = useState('');
     const [notice, setNotice] = useState('');
     const [description, setDescription] = useState('');
@@ -42,6 +43,7 @@ export default function CreateProduct() {
 
         setUploadPicture(true);
         setError('');
+        setImagePreview(URL.createObjectURL(file));
 
         try {
             const formData = new FormData();
@@ -57,7 +59,7 @@ export default function CreateProduct() {
             
             if (data.success) {
                 setImage(data.fileUrl);
-                alert('Image uploadée avec succès !');
+                setImagePreview(data.fileUrl);
             } else {
                 throw new Error(data.error || 'Erreur upload image');
             }
@@ -65,7 +67,7 @@ export default function CreateProduct() {
         } catch (err) {
             console.error('Erreur image:', err);
             setError(err.message);
-            alert('Erreur : ' + err.message);
+            setImagePreview('');
         } finally {
             setUploadPicture(false);
         }
@@ -91,6 +93,7 @@ export default function CreateProduct() {
             await createProduct(productData);
 
             setImage('');
+            setImagePreview('');
             setName('');
             setNotice('');
             setDescription('');
@@ -115,7 +118,26 @@ export default function CreateProduct() {
                 <h2>Créer un nouveau produit</h2>
                 <form className='form' onSubmit={handleSubmit}>
                     
-                    <Box sx={{ marginTop: 2 }}>
+                    {/* Image du produit */}
+                    <Box sx={{ marginTop: 2, padding: 2, border: '1px solid #ddd', borderRadius: '4px' }}>
+                        <h4 style={{ marginTop: 0 }}>Image du produit</h4>
+
+                        {/* Option 1 : coller URL depuis la bibliothèque */}
+                        <TextField
+                            fullWidth
+                            label="Coller l'URL depuis la bibliothèque médias"
+                            value={image}
+                            onChange={(e) => {
+                                setImage(e.target.value);
+                                setImagePreview(e.target.value);
+                            }}
+                            size="small"
+                            sx={{ marginBottom: 2 }}
+                            placeholder="https://res.cloudinary.com/..."
+                            disabled={uploadPicture || loading}
+                        />
+
+                        {/* Option 2 : uploader une nouvelle image */}
                         <input
                             accept="image/*"
                             style={{ display: 'none' }}
@@ -129,92 +151,42 @@ export default function CreateProduct() {
                                 variant="outlined"
                                 component="span"
                                 fullWidth
-                                disabled={uploadPicture}
+                                disabled={uploadPicture || loading}
                                 sx={{ padding: '10px' }}
                             >
-                                {uploadPicture ? '📤 Upload en cours...' : '🖼️ Choisir une image'}
+                                {uploadPicture ? '📤 Upload en cours...' : '🖼️ Uploader une nouvelle image'}
                             </Button>
                         </label>
+
                         {uploadPicture && <LinearProgress sx={{ marginTop: 1 }} />}
-                        {image && (
+
+                        {/* Aperçu */}
+                        {imagePreview && (
+                            <Box sx={{ marginTop: 2 }}>
+                                <img
+                                    src={imagePreview}
+                                    alt="aperçu"
+                                    style={{ width: '120px', height: '120px', objectFit: 'cover', borderRadius: '4px' }}
+                                />
+                            </Box>
+                        )}
+
+                        {image && !uploadPicture && (
                             <Typography sx={{ marginTop: 1, color: 'green', fontSize: '0.9rem' }}>
-                                ✅ Image uploadée avec succès !
+                                ✅ Image prête
                             </Typography>
                         )}
                     </Box>
                     
-                    <TextField 
-                        className='input_product' 
-                        fullWidth 
-                        label="Nom du produit" 
-                        margin="normal" 
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        disabled={loading}
-                        required 
-                    />
+                    <TextField className='input_product' fullWidth label="Nom du produit" margin="normal" value={name} onChange={(e) => setName(e.target.value)} disabled={loading} required />
+                    <TextField className='input_product' fullWidth label="Notice (courte description)" margin="normal" value={notice} onChange={(e) => setNotice(e.target.value)} disabled={loading} required />
+                    <TextField className='input_product' fullWidth label="Contenu (texte complet)" margin="normal" value={content} onChange={(e) => setContent(e.target.value)} disabled={loading} required />
+                    <TextField className='input_product' fullWidth label="Description complète" margin="normal" multiline rows={4} value={description} onChange={(e) => setDescription(e.target.value)} disabled={loading} required />
+                    <TextField className='input_product' fullWidth label="Prix" margin="normal" value={price} onChange={(e) => setPrice(e.target.value)} disabled={loading} required />
                     
-                    <TextField 
-                        className='input_product' 
-                        fullWidth 
-                        label="Notice (courte description)" 
-                        margin="normal"
-                        value={notice}
-                        onChange={(e) => setNotice(e.target.value)}
-                        disabled={loading}
-                        required 
-                    />
-
-                    <TextField 
-                        className='input_product' 
-                        fullWidth 
-                        label="Contenu (texte complet)" 
-                        margin="normal"
-                        value={content}
-                        onChange={(e) => setContent(e.target.value)}
-                        disabled={loading}
-                        required 
-                    />
-                    
-                    <TextField 
-                        className='input_product' 
-                        fullWidth 
-                        label="Description complète" 
-                        margin="normal" 
-                        multiline 
-                        rows={4}
-                        value={description}
-                        onChange={(e) => setDescription(e.target.value)}
-                        disabled={loading}
-                        required 
-                    />
-                    
-                    <TextField 
-                        className='input_product' 
-                        fullWidth 
-                        label="Prix" 
-                        margin="normal"
-                        value={price}
-                        onChange={(e) => setPrice(e.target.value)}
-                        disabled={loading}
-                        required 
-                    />
-                    
-                    <TextField 
-                        className='input_product' 
-                        fullWidth 
-                        label="Catégorie" 
-                        select 
-                        margin="normal"
-                        value={categories}
-                        onChange={(e) => setCategories(e.target.value)}
-                        disabled={loading}
-                        required
-                    >
+                    <TextField className='input_product' fullWidth label="Catégorie" select margin="normal" value={categories} onChange={(e) => setCategories(e.target.value)} disabled={loading} required>
                         {categoriesOptions.map((option) => (
-                            <MenuItem key={option.id} value={option.value}>
-                                {option.label}
-                            </MenuItem>
+                            <MenuItem key={option.id} value={option.value}>{option.label}</MenuItem>
                         ))}
                     </TextField>
 
@@ -230,20 +202,9 @@ export default function CreateProduct() {
                         helperText={fileUrl ? '✅ Lien prêt au téléchargement' : ''}
                     />
 
-                    {error && (
-                        <Box sx={{ color: 'red', marginTop: '10px' }}>
-                            {error}
-                        </Box>
-                    )}
+                    {error && <Box sx={{ color: 'red', marginTop: '10px' }}>{error}</Box>}
 
-                    <Button 
-                        className="basket_button" 
-                        fullWidth 
-                        type="submit" 
-                        variant="contained" 
-                        disabled={loading}
-                        sx={{ marginTop: '20px' }}
-                    >
+                    <Button className="basket_button" fullWidth type="submit" variant="contained" disabled={loading} sx={{ marginTop: '20px' }}>
                         {loading ? 'Création...' : 'Ajouter le produit'}
                     </Button>
                 </form>

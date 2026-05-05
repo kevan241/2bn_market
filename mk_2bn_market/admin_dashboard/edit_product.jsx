@@ -125,20 +125,26 @@ export default function EditProduct() {
                                 {editing === product._id ? (
                                     <form onSubmit={handleSubmit}>
 
-                                        {/* Upload image */}
+                                        {/* Image du produit */}
                                         <Box sx={{ marginBottom: 2, padding: 2, border: '1px solid #ddd', borderRadius: '4px' }}>
                                             <h4 style={{ marginTop: 0 }}>Image du produit</h4>
 
-                                            {imagePreview && (
-                                                <Box sx={{ marginBottom: 1 }}>
-                                                    <img
-                                                        src={imagePreview}
-                                                        alt="aperçu"
-                                                        style={{ width: '120px', height: '120px', objectFit: 'cover', borderRadius: '4px' }}
-                                                    />
-                                                </Box>
-                                            )}
+                                            {/* Option 1 : coller URL depuis la bibliothèque */}
+                                            <TextField
+                                                fullWidth
+                                                label="Coller l'URL depuis la bibliothèque médias"
+                                                value={formData.image}
+                                                onChange={(e) => {
+                                                    setFormData(prev => ({ ...prev, image: e.target.value }));
+                                                    setImagePreview(e.target.value);
+                                                }}
+                                                size="small"
+                                                sx={{ marginBottom: 2 }}
+                                                placeholder="https://res.cloudinary.com/..."
+                                                disabled={uploadingImage || loading}
+                                            />
 
+                                            {/* Option 2 : uploader une nouvelle image */}
                                             <input
                                                 accept="image/*"
                                                 style={{ display: 'none' }}
@@ -154,7 +160,7 @@ export default function EditProduct() {
                                                     disabled={uploadingImage || loading}
                                                     size="small"
                                                 >
-                                                    {uploadingImage ? '📤 Upload en cours...' : '🖼️ Changer l\'image'}
+                                                    {uploadingImage ? '📤 Upload en cours...' : '🖼️ Uploader une nouvelle image'}
                                                 </Button>
                                             </label>
 
@@ -165,68 +171,34 @@ export default function EditProduct() {
                                                     ✅ Image mise à jour
                                                 </Typography>
                                             )}
+
+                                            {/* Aperçu */}
+                                            {imagePreview && (
+                                                <Box sx={{ marginTop: 2 }}>
+                                                    <img
+                                                        src={imagePreview}
+                                                        alt="aperçu"
+                                                        style={{ width: '120px', height: '120px', objectFit: 'cover', borderRadius: '4px' }}
+                                                    />
+                                                </Box>
+                                            )}
                                         </Box>
 
-                                        <TextField
-                                            fullWidth
-                                            label="Nom"
-                                            value={formData.name}
-                                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                            margin="normal"
-                                            disabled={loading}
-                                        />
-                                        <TextField
-                                            fullWidth
-                                            label="Prix"
-                                            value={formData.price}
-                                            onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                                            margin="normal"
-                                            disabled={loading}
-                                        />
-                                        <TextField
-                                            fullWidth
-                                            label="Description"
-                                            value={formData.description}
-                                            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                            margin="normal"
-                                            multiline
-                                            rows={3}
-                                            disabled={loading}
-                                        />
-                                        <TextField
-                                            fullWidth
-                                            label="Notice"
-                                            value={formData.notice}
-                                            onChange={(e) => setFormData({ ...formData, notice: e.target.value })}
-                                            margin="normal"
-                                            disabled={loading}
-                                        />
-                                        <TextField
-                                            fullWidth
-                                            label="Catégorie"
-                                            value={formData.categories}
-                                            onChange={(e) => setFormData({ ...formData, categories: e.target.value })}
-                                            margin="normal"
-                                            disabled={loading}
-                                        />
+                                        <TextField fullWidth label="Nom" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} margin="normal" disabled={loading} />
+                                        <TextField fullWidth label="Prix" value={formData.price} onChange={(e) => setFormData({ ...formData, price: e.target.value })} margin="normal" disabled={loading} />
+                                        <TextField fullWidth label="Description" value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} margin="normal" multiline rows={3} disabled={loading} />
+                                        <TextField fullWidth label="Notice" value={formData.notice} onChange={(e) => setFormData({ ...formData, notice: e.target.value })} margin="normal" disabled={loading} />
+                                        <TextField fullWidth label="Catégorie" value={formData.categories} onChange={(e) => setFormData({ ...formData, categories: e.target.value })} margin="normal" disabled={loading} />
 
-                                        {/* Upload fichier */}
+                                        {/* Fichier téléchargeable */}
                                         <Box sx={{ marginTop: 2, marginBottom: 2, padding: 2, border: '1px solid #ddd', borderRadius: '4px' }}>
                                             <h4 style={{ marginTop: 0 }}>Fichier téléchargeable</h4>
-
                                             {formData.fileUrl && (
                                                 <Box sx={{ marginBottom: 2, color: 'green', fontSize: '0.85rem' }}>
                                                     ✅ Fichier actuel : {formData.fileUrl}
                                                 </Box>
                                             )}
-
-                                            <input
-                                                type="file"
-                                                onChange={handleFileChange}
-                                                disabled={loading}
-                                                style={{ marginTop: '10px' }}
-                                            />
-
+                                            <input type="file" onChange={handleFileChange} disabled={loading} style={{ marginTop: '10px' }} />
                                             {selectedFile && (
                                                 <Box sx={{ marginTop: 1, color: 'blue', fontSize: '0.85rem' }}>
                                                     📎 Nouveau fichier : {selectedFile.name}
@@ -246,11 +218,7 @@ export default function EditProduct() {
                                 ) : (
                                     <>
                                         {product.image && (
-                                            <img
-                                                src={product.image}
-                                                alt={product.name}
-                                                style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '4px', marginBottom: '8px' }}
-                                            />
+                                            <img src={product.image} alt={product.name} style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '4px', marginBottom: '8px' }} />
                                         )}
                                         <h3>{product.name}</h3>
                                         <p><strong>Prix:</strong> {product.price}</p>
@@ -260,9 +228,7 @@ export default function EditProduct() {
                                             ? <p><strong>Fichier:</strong> ✅ {product.fileUrl}</p>
                                             : <p><strong>Fichier:</strong> ❌ Aucun</p>
                                         }
-                                        <Button variant="outlined" onClick={() => handleEdit(product)}>
-                                            Modifier
-                                        </Button>
+                                        <Button variant="outlined" onClick={() => handleEdit(product)}>Modifier</Button>
                                     </>
                                 )}
                             </CardContent>
