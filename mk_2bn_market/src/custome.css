@@ -546,6 +546,10 @@ p{
     display: none;
 }
 
+.basket {
+    display: none;
+}
+
 p.notice {
     display: none;
 }
