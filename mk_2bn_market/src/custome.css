@@ -361,7 +361,7 @@ body {
 .slider_dots {
     position: absolute;
     left: 50%;
-    top: 310px;
+    top: 338px;
     transform: translateX(-50%);
     display: flex;
     gap: 10px;    
@@ -621,7 +621,7 @@ p.notice {
     }
 
     .slider_content_two {
-        background-image: url(/assets/slider01-aHHUHA6e.jpg);
+    background-image: url(/assets/slider02-CurAaKkx.jpg);
         background-position: center;
         background-repeat: no-repeat;
         background-size: cover;
