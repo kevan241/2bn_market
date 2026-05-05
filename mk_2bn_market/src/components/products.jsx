@@ -20,7 +20,7 @@ export default function Products({ onAddToBasket }) {
 
     return (
         <Box className="products_container">
-            <h2 aria-label="Documents" datatype="documents documents_word">Nos Produits</h2>
+            <h2 aria-label="Documents" datatype="documents documents_word">Découvrez nos Produits</h2>
             <Box className="products_list" sx={{ marginTop: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '30px' }}>
                 {products.map(product => (
                     <div className="product_container" key={product._id}>
