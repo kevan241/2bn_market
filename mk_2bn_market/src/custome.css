@@ -361,7 +361,7 @@ body {
 .slider_dots {
     position: absolute;
     left: 50%;
-    top: 338px;
+    top: 310px;
     transform: translateX(-50%);
     display: flex;
     gap: 10px;    
@@ -639,7 +639,7 @@ p.notice {
 .slider_dots {
     position: absolute;
     left: 50%;
-    top: 376px;
+    top: 330px;
     transform: translateX(-50%);
     display: flex;
     gap: 10px;
@@ -656,17 +656,33 @@ p.notice {
 .slider_content_one h1 {
     margin: 0;
     font-family: poppins-regular;
-    font-size: 23px;
+    font-size: 18px;
 }
 
 
 .slider_content_two h1 {
     margin: 0;
     font-family: poppins-regular;
-    font-size: 23px;
+    font-size: 18px;
 }
 
 
+.product_profil_container{
+    display: flex;
+    padding: 30px 35px;
+    flex-direction: column;
+}
+
+
+.profil_product_container_details {
+    box-sizing: border-box;
+    padding: 20px 0px 0 0px;
+    overflow: hidden !important;
+}
+
+.profil_product_container_img.MuiBox-root.css-1xu3tth {
+    width: 100%;
+}
 
 
 
