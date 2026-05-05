@@ -669,7 +669,7 @@ p.notice {
 
 .product_profil_container{
     display: flex;
-    padding: 30px 35px;
+    padding: 30px 20px;
     flex-direction: column;
 }
 
