@@ -616,7 +616,7 @@ p.notice {
         display: flex;
         text-align: left;
         align-items: center;
-        padding: 34px !important;
+        padding: 34px 15px!important;
         height: 236px;
     }
 
@@ -631,7 +631,7 @@ p.notice {
         display: flex;
         text-align: left;
         align-items: center;
-        padding: 34px !important;
+        padding: 34px 15px!important;
         height: 236px;
     }
 
@@ -646,6 +646,12 @@ p.notice {
     z-index: 888;
 }
 
+
+.logo_marketplace {
+    font-family: 'poppins-bold';
+    font-size: 12px;
+    line-height: 22px;
+}
 
 .slider_content_one h1 {
     margin: 0;
