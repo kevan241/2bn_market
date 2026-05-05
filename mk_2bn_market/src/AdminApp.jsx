@@ -4,6 +4,7 @@ import Dashboard from "../admin_dashboard/services/dashboard";
 import CreateProduct from "../admin_dashboard/create_product";
 import InventoryProduct from "../admin_dashboard/inventory_product";
 import EditProduct from "../admin_dashboard/edit_product";
+import MediaLibrary from "../admin_dashboard/MediaLibrary";
 
 export default function AdminApp() {
   return (
@@ -14,6 +15,7 @@ export default function AdminApp() {
         <Route path="/admin/create-product" element={<CreateProduct />} />
         <Route path="/admin/edit-product" element={<EditProduct />} />
         <Route path="/admin/inventory" element={<InventoryProduct />} />
+        <Route path="/admin/media-library" element={<MediaLibrary />} />
       </Routes>
     </>
   );

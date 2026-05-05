@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const fileUpload = require('express-fileupload');
 const connectDB = require('./config/database');
+const cloudinaryRoutes = require('./routes/cloudinary'); 
 
 const app = express();
 
@@ -34,6 +35,8 @@ app.use('/api/payment/callback', (req, res, next) => {
 });
 
 app.use('/uploads', express.static('public/uploads'));
+//cloudinary
+app.use('/api/cloudinary', cloudinaryRoutes); 
 
 // Routes
 const productRoutes = require('./routes/products');

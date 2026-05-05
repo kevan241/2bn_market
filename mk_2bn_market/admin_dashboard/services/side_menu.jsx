@@ -6,6 +6,7 @@ import Historique from '../../public/img/icons/historique.png';
 import DashboardIcon from '../../public/img/icons/dashboard.png';
 import LogOut from '../../public/img/icons/logout.png';
 import EditIcon from '../../public/img/icons/edit.png';
+import MediaIcon from '../../public/img/icons/MediaIcon.png';
 import { Link } from "react-router-dom";
 
 export default function SideMenu(){
@@ -17,6 +18,7 @@ export default function SideMenu(){
                     <Link to="/admin/edit-product"><div style={{display:'flex'}}><span><img src={EditIcon} alt="Modifier un produit" width='60%' /></span><span><li>Modifier un produits</li></span></div></Link>
                     <Link to="/admin/inventory"><div style={{display:'flex'}}><span><img src={InventoryIcon} alt="Inventaire" width='50%' /></span><span><li>Inventaire des produits</li></span></div></Link>
                     <Link to="/admin/create-user"><div style={{display:'flex'}}><span><img src={AddUser} alt="Ajouter utilisateur" width='60%' /></span><span><li>Crée des comptes utilisateurs</li></span></div></Link>
+                    <Link to="/admin/media-library"><div style={{display:'flex'}}><span><img src={MediaIcon} alt="Bibliothèque" width='60%' /></span><span><li>Bibliothèque médias</li></span></div></Link>
                     <Link to="/admin/sales-history"><div style={{display:'flex'}}><span><img src={Historique} alt="Historique des ventes" width='60%' /></span><span><li>Historique des ventes</li></span></div></Link>
                     <Button className="logout_button"><div  style={{display:'flex'}}><span><img src={LogOut} alt="Se deconnecter" width='40%' /></span><span><li>Se deconnecter</li></span></div></Button>
                 </ul>
