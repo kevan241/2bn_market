@@ -32,7 +32,7 @@ export default function Products({ onAddToBasket }) {
                             <img src={product.image} alt={product.name} width='100%' />
                         </div>
                         <div className="details_product">
-                            <h3>{product.name}</h3>
+                            <h3 className="title_product">{product.name}</h3>
                             <p className="price">{product.price}</p>
                             <p className="notice">{product.notice}</p>
                             <p className="description">{product.description}</p>
