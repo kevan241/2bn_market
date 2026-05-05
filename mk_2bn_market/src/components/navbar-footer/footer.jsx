@@ -5,21 +5,21 @@ export default function Footer() {
     return(
         <Box className="footer_container" sx={{display:'flex',flexDirection:'column'}}>
             <div className="block_one_footer">
-                <div><h3>Nos services</h3>
+                <div className="footer_container_menu"><h3>Nos services</h3>
                     <ul>
                         <li>Formation comptabilités</li>
                         <li>Formation vidéos</li>
                         <li>Formation Excel</li>
                     </ul>
                 </div>
-                <div><h3>Liens utiles</h3>
+                <div className="footer_container_menu"><h3>Liens utiles</h3>
                     <ul>
                         <li>A propos de nous</li>
                         <li>Nos experts</li>
                         <li>FAQ</li>
                     </ul>
                 </div>
-                <div><h3>Conditions générales de vente</h3>
+                <div className="footer_container_menu"><h3>Conditions générales de vente</h3>
                     <ul>
                         <li>Politique de facturation</li>
                         <li>Licence d’utilisation des contenus</li>
@@ -27,7 +27,7 @@ export default function Footer() {
                         <li>Service client / support</li>
                     </ul>
                 </div>
-                <div><h3>Mentions légales</h3>
+                <div className="footer_container_menu"><h3>Mentions légales</h3>
                     <ul>
                         <li>Données personnelles</li>
                         <li>Propriété intellectuelle</li>
