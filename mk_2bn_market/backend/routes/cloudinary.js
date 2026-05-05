@@ -11,7 +11,7 @@ cloudinary.config({
 router.get('/images', async (req, res) => {
     try {
         const result = await cloudinary.search
-            .expression('folder:Images')
+            .expression('resource_type:image')
             .sort_by('created_at', 'desc')
             .max_results(100)
             .execute();
