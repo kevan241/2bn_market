@@ -110,7 +110,7 @@ export default function MediaLibrary() {
                         Aucune image trouvée. Commence par en uploader une !
                     </Typography>
                 ) : (
-                    <Box sx={{
+                    <Box className="image-grid" sx={{
                         display: 'grid',
                         gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
                         gap: '16px',

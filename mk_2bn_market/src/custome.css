@@ -71,6 +71,10 @@ body {
     font-size: 12px;
 }
 
+.image-grid {
+    margin-left: 25%;
+}
+
 .logo_marketplace{
     font-family: 'poppins-bold';
 }
