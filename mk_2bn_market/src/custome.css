@@ -541,7 +541,7 @@ p{
     display: none;
 }
 
-button.basket_button
+.product_container button.basket_button
  {
     display: none;
 }
@@ -683,6 +683,10 @@ p.notice {
 .profil_product_container_img.MuiBox-root.css-1xu3tth {
     width: 100%;
 }
+
+button.basket_button {
+        display: inline;
+    }
 
 
 
