@@ -45,7 +45,6 @@ export default function Navbar({ count, items, onRemoveItem }) {
                 /* ───── Hamburger styles (mobile only) ───── */
                 @media (max-width: 414px) {
 
-                    /* Cache les liens de navigation, la recherche et l'auth classiques */
                     .navbar_container .pages_link,
                     .navbar_container .search,
                     .navbar_container .desktop_only {
@@ -70,7 +69,7 @@ export default function Navbar({ count, items, onRemoveItem }) {
                         display: block;
                         width: 24px;
                         height: 2px;
-                        background: currentColor;
+                        background: rgb(255 255 255);
                         border-radius: 2px;
                         transition: transform 0.3s ease, opacity 0.3s ease;
                         transform-origin: center;
