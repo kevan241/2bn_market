@@ -16,7 +16,7 @@ export default function Products({ onAddToBasket }) {
         });
     }, []);
 
-    if (loading) return <div sx={{ color: 'black' }}>Chargement des produits...</div>;
+    if (loading) return <div className="product_load">Chargement des produits...</div>;
 
     return (
         <Box className="products_container">

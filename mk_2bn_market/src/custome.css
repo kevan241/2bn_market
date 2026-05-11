@@ -531,6 +531,11 @@ p{
     color: var(--text);
 }
 
+.product_load{
+    color: #000000!important;
+    font-weight: bold;
+    margin: 50px 50px;
+}
  /*responsive*/
  @media(max-width: 414px) {
 .products_container {
