@@ -143,7 +143,7 @@ router.get('/return', async (req, res) => {
     if (bill_id) {
       try {
         const billStatus = await axios.get(
-          `https://lab.billing-easy.net/api/v1/merchant/e_bills/${bill_id}`,
+          `https://stg.billing-easy.com/api/v1/merchant/e_bills/${bill_id}`,
           {
             headers: {
               'Authorization': getAuthHeader(),
