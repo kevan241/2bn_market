@@ -75,7 +75,7 @@ router.post('/create-ebill', async (req, res) => {
         status: 'pending'
       });
       
-      const payment_url = `https://test.billing-easy.net/?invoice=${bill_id}&redirect_url=${BACKEND_URL}/api/payment/return`;
+      const payment_url = `https://staging.billing-easy.net/?invoice=${bill_id}&redirect_url=${BACKEND_URL}/api/payment/return`;
 
       console.log('URL de paiement:', payment_url);
       
