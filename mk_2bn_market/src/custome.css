@@ -536,6 +536,24 @@ p{
     font-weight: bold;
     margin: 50px 50px;
 }
+
+.not-found-container{
+    display: flex;
+    flex-direction: column;
+    justify-content:center;
+    align-items: center;
+    height: 50vh;
+}
+
+.not-found-container .title{
+    color: #032859!important;
+    font-weight: bold;
+}
+
+.not-found-container .elements{
+    color: black!important;
+    font-weight: bold;
+}
  /*responsive*/
  @media(max-width: 414px) {
 .products_container {

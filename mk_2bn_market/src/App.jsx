@@ -6,6 +6,7 @@ import Navbar from "./components/navbar-footer/navbar";
 import Footer from "./components/navbar-footer/footer";
 import EbillingPaiement from "./components/checkout/ebilling_paiement";
 import PaymentSuccess from './components/payment-success';
+import NotFound from "./components/404_not_found";
 import './custome.css'
 
 export default function App() {
@@ -39,6 +40,7 @@ export default function App() {
     <>
       <Navbar count={basketCount} items={basketItems} onRemoveItem={removeFromBasket} />
       <Routes>
+        <Route path="*" element={<NotFound />} />
         <Route path="/" element={<Home onAddToBasket={addToBasket} />} />
         <Route path="/product/:id" element={<Product_file/>} />
         <Route path="/payment" element={<EbillingPaiement />} />
